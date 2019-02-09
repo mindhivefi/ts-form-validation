@@ -1,0 +1,60 @@
+Arguments: 
+  /usr/local/Cellar/node@8/8.11.3_1/bin/node /Users/villevenalainen/.yarn/bin/yarn.js add --exact --dev typescript tslint @types/ts-jest ts-jest jest
+
+PATH: 
+  /Applications/Beyond Compare.app/Contents/MacOS:/Users/villevenalainen/.yarn/bin:/usr/local/Cellar/node@8/8.11.3_1/bin/:/Users/villevenalainen/.fastlane/bin:/Users/villevenalainen/Documents/Mindhive_oy/Platforms/google-cloud-sdk/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Applications/Beyond Compare.app/Contents/MacOS:/Users/villevenalainen/.yarn/bin:/usr/local/Cellar/node@8/8.11.3_1/bin/:/Users/villevenalainen/.fastlane/bin:/Users/villevenalainen/Documents/Mindhive_oy/Platforms/google-cloud-sdk/bin
+
+Yarn version: 
+  1.3.2
+
+Node version: 
+  8.11.3
+
+Platform: 
+  darwin x64
+
+npm manifest: 
+  {
+    "name": "ts-form-validation",
+    "version": "1.0.0",
+    "description": "A simple framework to do form validation using Typescript's magnificent strong typing features. Framework focuses only to validation of values and informing the state of the form. It is totally ui-implmentation independent.",
+    "main": "lib/index.js",
+    "scripts": {
+      "test": "jest"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/mindhivefi/ts-form-validation.git"
+    },
+    "keywords": [
+      "form",
+      "validation",
+      "typescript",
+      "typing"
+    ],
+    "author": "Ville Venäläinen / Mindhive Oy",
+    "license": "ISC",
+    "bugs": {
+      "url": "https://github.com/mindhivefi/ts-form-validation/issues"
+    },
+    "homepage": "https://github.com/mindhivefi/ts-form-validation#readme"
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
+
+Trace: 
+  Error: https://registry.yarnpkg.com/@types%2fts-jest: Not found
+      at Request.params.callback [as _callback] (/Users/villevenalainen/.yarn/lib/cli.js:62098:18)
+      at Request.self.callback (/Users/villevenalainen/.yarn/lib/cli.js:123085:22)
+      at emitTwo (events.js:126:13)
+      at Request.emit (events.js:214:7)
+      at Request.<anonymous> (/Users/villevenalainen/.yarn/lib/cli.js:124068:10)
+      at emitOne (events.js:116:13)
+      at Request.emit (events.js:211:7)
+      at IncomingMessage.<anonymous> (/Users/villevenalainen/.yarn/lib/cli.js:123988:12)
+      at Object.onceWrapper (events.js:313:30)
+      at emitNone (events.js:111:20)

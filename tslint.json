@@ -1,0 +1,21 @@
+{
+  "autoFixOnSave": true,
+  "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
+  "jsRules": {
+    "object-literal-sort-keys": false,
+    "no-console": false
+  },
+  "linterOptions": {
+    "exclude": ["lib/**/*.js", "node_modules/**/*.ts", "coverage/lcov-report/*.js"]
+  },
+  "rules": {
+    "no-console": false,
+    "no-bitwise": false,
+    "interface-name": false,
+    "jsx-boolean-value": false,
+    "object-literal-sort-keys": false,
+    "jsx-no-lambda": false,
+    "no-unused-expression": false
+  },
+  "rulesDirectory": []
+}

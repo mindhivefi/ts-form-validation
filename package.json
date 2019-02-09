@@ -1,0 +1,43 @@
+{
+  "name": "ts-form-validation",
+  "version": "1.0.0",
+  "description": "A simple framework to do form validation using Typescript's magnificent strong typing features. Framework focuses only to validation of values and informing the state of the form. It is totally ui-implmentation independent.",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "scripts": {
+    "clean": "rimraf -f -r -d lib",
+    "prebuild": "yarn clean",
+    "build": "tsc",
+    "lint": "tslint --fix ./src/**/*.ts*",
+    "test": "jest",
+    "test:watch": "jest --watch ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mindhivefi/ts-form-validation.git"
+  },
+  "keywords": [
+    "form",
+    "validation",
+    "typescript",
+    "typing"
+  ],
+  "author": "Ville Venäläinen / Mindhive Oy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mindhivefi/ts-form-validation/issues"
+  },
+  "homepage": "https://github.com/mindhivefi/ts-form-validation#readme",
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "devDependencies": {
+    "@types/jest": "24.0.0",
+    "jest": "24.1.0",
+    "rimraf": "2.6.3",
+    "ts-jest": "23.10.5",
+    "ts-lint": "4.5.1",
+    "tslint": "5.12.1",
+    "typescript": "3.3.3"
+  }
+}
