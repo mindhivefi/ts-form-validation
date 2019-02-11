@@ -77,7 +77,7 @@ export interface ValidationMessage {
   type: MessageType;
 
   /**
-   * Error code if any available
+   * Message code if any available
    */
   code?: FormValidationMessageCode;
   /**
@@ -111,8 +111,18 @@ export interface FormValidationFields<T> {
 }
 
 export interface RequiredFieldValidationFields<T> {
+  /**
+   * The actual form values. If there are preprocessing defined in rules, all preprocessing
+   * is already done to these values.
+   */
   values: T;
+  /**
+   * Set of fields, where user has already set an value
+   */
   filled: FilledFormFields<T>;
+  /**
+   * Tells if the form is valid after field validators
+   */
   isFormValid: boolean;
 }
 
@@ -140,35 +150,37 @@ export function validateFormFields<T>(form: Form<T>): FormValidationFields<T> {
   const { values, filled, rules } = form;
 
   let messages = {} as MessageFields<T>;
-  let isFormValid = !rules.fields || areRequiredFieldsFilled(values, filled, rules.fields);
+  let isFormValid = true;
 
   if (rules.fields) {
     for (const fieldKey in rules.fields) {
       const validator = rules.fields[fieldKey];
       if (validator) {
-        if (!filled[fieldKey]) {
-          continue;
-        }
         const field = values[fieldKey];
-        // Check if required field
-        if (validator.required && (field === undefined || (typeof field === 'string' && field.length === 0))) {
-          messages[fieldKey] = {
-            type: MessageType.ERROR,
-            code: FormValidationMessageCode.FIELD_IS_REQUIRED,
-            message: DEFAULT_ERRORMESSAGE_FIELD_IS_REQUIRED,
-          };
-          isFormValid = false;
-          continue;
-        }
         // Do preprocessing first
         const value = preprocessFormValue(validator!, field);
         values[fieldKey] = value;
 
-        // Custom validtion
+        // Check if required field
+        if (validator.required && (value === undefined || (typeof value === 'string' && value.length === 0))) {
+          if (filled[fieldKey]) {
+            messages[fieldKey] = {
+              type: MessageType.ERROR,
+              code: FormValidationMessageCode.FIELD_IS_REQUIRED,
+              message: DEFAULT_ERRORMESSAGE_FIELD_IS_REQUIRED,
+            };
+          }
+          isFormValid = false;
+          continue;
+        }
+
+        // Custom validation
         if (validator.validate) {
           const validation = validator.validate(value);
           if (validation) {
-            messages[fieldKey] = validation;
+            if (filled[fieldKey]) {
+              messages[fieldKey] = validation;
+            }
             isFormValid = false;
           }
         }
@@ -200,7 +212,7 @@ export function validateFormFields<T>(form: Form<T>): FormValidationFields<T> {
  */
 function preprocessFormValue(validator: FieldValidator, value: any) {
   if (!value) {
-    return undefined;
+    return value;
   }
   if (validator.trim && typeof value === 'string') {
     value = value.trim();
@@ -209,37 +221,4 @@ function preprocessFormValue(validator: FieldValidator, value: any) {
     value = validator.preprocess(value);
   }
   return value;
-}
-
-/**
- * Check if the fields that are marked as required have an input.
- *
- * @export
- * @template T
- * @param {T} values
- * @param {FilledFormFields<T>} filled
- * @param {Partial<FieldValidatorMap<T>>} validatorMap
- * @returns {boolean}
- */
-export function areRequiredFieldsFilled<T>(
-  values: T,
-  filled: FilledFormFields<T>,
-  validatorMap: Partial<FieldValidatorMap<T>>,
-): boolean {
-  for (const key in validatorMap) {
-    if (key) {
-      const validator = validatorMap[key];
-      if (validator && validator.required) {
-        if (!filled[key]) {
-          return false;
-        }
-        const value = values[key];
-        const fieldFilled = value && (typeof value === 'string' ? value.trim().length > 0 : true);
-        if (!fieldFilled) {
-          return false;
-        }
-      }
-    }
-  }
-  return true;
 }
