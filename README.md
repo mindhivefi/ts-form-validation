@@ -1,19 +1,19 @@
 # ts-form-validation
 
-This is a simple package to do form validation using Typescript's magnificent strong typing features. Framework focuses give an uniform architecture for validating a form fields and a form as a whole with a proper state validation. To do actual field type validations, I recommend to use this library besided some other such as [validator -library](https://www.npmjs.com/package/validator) or some other to actiel fields validity checks.
+This is a simple package to do form validation using Typescript's magnificent strong typing features. Framework focuses give an uniform architecture for validating a form fields and a form as a whole with a proper state validation. To do actual field type validations, it is recommended to use this library besides some other library such as [validator -library](https://www.npmjs.com/package/validator) or some other to actual fields validity checks.
 
 ## Installation
 
 All you need to do is to:
 
 ```bash
-yarn add --dev ts-form-validation
+yarn add ts-form-validation
 ```
 
 or
 
 ```bash
-npm install -D ts-form-validation
+npm install ts-form-validation
 ```
 
 ## Using validator
