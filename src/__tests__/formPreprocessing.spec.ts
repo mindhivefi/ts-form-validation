@@ -1,24 +1,24 @@
-import { validateFormFields } from '../';
+import { validateForm } from '../';
 
 describe('Form preprocessing', () => {
-  it('If trim is set, whitespaces will be removed from start and end', () => {
-    expect(
-      validateFormFields({
-        values: {
-          a: '  cat  ',
-        },
-        filled: {
-          a: true,
-        },
-        rules: {
-          fields: {
-            a: {
-              trim: true,
-            },
+  it('If trim is set, whitespaces will be removed from start and end of the field value', () => {
+    const input = {
+      values: {
+        a: '  cat  ',
+      },
+      filled: {
+        a: true,
+      },
+      rules: {
+        fields: {
+          a: {
+            trim: true,
           },
         },
-      }),
-    ).toEqual({
+      },
+    };
+    expect(validateForm(input)).toEqual({
+      ...input,
       values: {
         a: 'cat',
       },
@@ -27,24 +27,25 @@ describe('Form preprocessing', () => {
     });
   });
 
-  it('If supports custom preprocessor methods', () => {
-    expect(
-      validateFormFields({
-        values: {
-          a: 'cat',
-        },
-        filled: {
-          a: true,
-        },
-        rules: {
-          fields: {
-            a: {
-              preprocess: (value: any) => `${value}fish`,
-            },
+  it('Will call preprocessor method if it defined for the field', () => {
+    const input = {
+      values: {
+        a: 'cat',
+      },
+      filled: {
+        a: true,
+      },
+      rules: {
+        fields: {
+          a: {
+            preprocess: (value: any) => `${value}fish`,
           },
         },
-      }),
-    ).toEqual({
+      },
+    };
+
+    expect(validateForm(input)).toEqual({
+      ...input,
       values: {
         a: 'catfish',
       },
