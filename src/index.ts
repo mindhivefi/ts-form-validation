@@ -8,13 +8,25 @@
 
 export const DEFAULT_ERRORMESSAGE_FIELD_IS_REQUIRED = 'This field is required';
 
+/**
+ * Validator definitions for a single form field.
+ */
 export interface FieldValidator {
   /**
    * Is field required. Default is false.
    */
   required?: boolean;
+  /**
+   * Trim whitespaces from string's begining and end.
+   */
   trim?: boolean;
+  /**
+   * Do custom preprocessing for the form value, before the validation.
+   */
   preprocess?: (value: any) => any;
+  /**
+   * Validate Fields given value
+   */
   validate?: (value: any) => MessageField;
 }
 
@@ -104,10 +116,25 @@ export type MessageFields<T> = MapType<T, MessageField>;
  */
 export type FilledFormFields<T> = Partial<BooleanMap<T>>;
 
-export interface FormValidationFields<T> {
+export interface FormValidationResponse<T> {
+  /**
+   * Form values after validation. These values can be altered by the preprocessing.
+   */
   values: T;
+  /**
+   *
+   */
   messages: MessageFields<T>;
+
+  /**
+   * True if form has no errors after validation.
+   */
   isFormValid: boolean;
+
+  /**
+   * Message included into form level
+   */
+  formMessage?: MessageField;
 }
 
 export interface RequiredFieldValidationFields<T> {
@@ -126,7 +153,13 @@ export interface RequiredFieldValidationFields<T> {
   isFormValid: boolean;
 }
 
+/**
+ * Rule definitions for form validation
+ */
 export interface FormValidationRules<T> {
+  /**
+   * Do validation
+   */
   validateForm?: (
     form: RequiredFieldValidationFields<T>,
   ) => {
@@ -135,18 +168,36 @@ export interface FormValidationRules<T> {
     formMessage?: ValidationMessage;
   };
 
+  /**
+   * Field specific validators
+   */
   fields?: Partial<FieldValidatorMap<T>>;
 }
 
 /**
- * Validate form input against the rules defined
+ * Options to control how the form validation flow will be executed.
+ */
+export interface ValidateFormOptions {
+  /**
+   * Disable preprocessor. Default value is true
+   */
+  usePreprocessor: boolean;
+}
+
+/**
+ * Validate form input against a defined rules
  *
  * @export
  * @template T Type of form fields
  *
- * @returns {FormValidationFields<T>}
+ * @param form The form info for controlling validation
+ * @param options: Extra options to control validation process
+ * @returns {FormValidationResponse<T>}
  */
-export function validateFormFields<T>(form: Form<T>): FormValidationFields<T> {
+export function validateForm<T>(
+  form: Form<T>,
+  options: ValidateFormOptions = { usePreprocessor: true },
+): FormValidationResponse<T> {
   const { values, filled, rules } = form;
 
   let messages = {} as MessageFields<T>;
@@ -158,7 +209,7 @@ export function validateFormFields<T>(form: Form<T>): FormValidationFields<T> {
       if (validator) {
         const field = values[fieldKey];
         // Do preprocessing first
-        const value = preprocessFormValue(validator!, field);
+        const value = options.usePreprocessor ? preprocessFormValue(validator!, field) : field;
         values[fieldKey] = value;
 
         // Check if required field
@@ -176,12 +227,14 @@ export function validateFormFields<T>(form: Form<T>): FormValidationFields<T> {
 
         // Custom validation
         if (validator.validate) {
-          const validation = validator.validate(value);
-          if (validation) {
+          const validationResult = validator.validate(value);
+          if (validationResult) {
             if (filled[fieldKey]) {
-              messages[fieldKey] = validation;
+              messages[fieldKey] = validationResult;
             }
-            isFormValid = false;
+            if (isFormValid) {
+              isFormValid = validationResult.type !== MessageType.ERROR;
+            }
           }
         }
       }
@@ -204,11 +257,29 @@ export function validateFormFields<T>(form: Form<T>): FormValidationFields<T> {
 }
 
 /**
- * De proprocessing for the field value
+ * Checks if form has specific type of messages included.
+ *
+ * @param response Form response object
+ * @param type Message type type be checked
+ */
+export const formHaveMessagesOfType = (response: FormValidationResponse<any>, type: MessageType): boolean => {
+  if (response.messages) {
+    for (const key in response.messages) {
+      const field = response.messages[key];
+      if (field && field.type === MessageType.ERROR) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
+/**
+ * Do proprocessing for the field value
  *
  * @param {(FieldValidator | undefined)} validator
  * @param {*} value
- * @returns
+ * @returns Preprocessed value
  */
 function preprocessFormValue(validator: FieldValidator, value: any) {
   if (!value) {

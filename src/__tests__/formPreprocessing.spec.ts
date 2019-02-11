@@ -1,9 +1,9 @@
-import { validateFormFields } from '../';
+import { validateForm } from '../';
 
 describe('Form preprocessing', () => {
-  it('If trim is set, whitespaces will be removed from start and end', () => {
+  it('If trim is set, whitespaces will be removed from start and end of the field value', () => {
     expect(
-      validateFormFields({
+      validateForm({
         values: {
           a: '  cat  ',
         },
@@ -27,9 +27,9 @@ describe('Form preprocessing', () => {
     });
   });
 
-  it('If supports custom preprocessor methods', () => {
+  it('Will call preprocessor method if it defined for the field', () => {
     expect(
-      validateFormFields({
+      validateForm({
         values: {
           a: 'cat',
         },

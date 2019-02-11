@@ -1,6 +1,6 @@
 # ts-form-validation
 
-This is a simple framework to do form validation using Typescript's magnificent strong typing features. Framework focuses only to validation of values and informing the state of the form. It is totally ui-implementation independent.
+This is a simple package to do form validation using Typescript's magnificent strong typing features. Framework focuses give a uniform architecture for validating a form fields and a form as a whole with a proper state validation. To do actual field type validations, I recommend to use this library besided some other such as [valide -library](https://www.npmjs.com/package/validator) or some other to actiel fields validity checks.
 
 ## Installation
 
@@ -48,15 +48,16 @@ const rules: FormValidationRules<RegisterForm> {
     email: {
       required: true,
       trim: true,
-      validate: (value: any) => isValidEmail(value)
+      // We are using validator -library here to to actual email -check
+      validate: (value: any) => validator.isEmail(value)
     },
     password1: {
       required: true,
-      validate: (value: any) => isValidPassword(value)
+      validate: (value: any) => validator.isLength(value, {min: 7, max: 20})
     },
     password2: {
       required: true,
-      validate: (value: any) => isValidPassword(value)
+      validate: (value: any) => validator.isLength(value, {min: 7, max: 20})
     },
   }
 };
@@ -198,5 +199,11 @@ export default class RegisterScreen extends React.Component<any, State> {
   }
 }
 ```
+
+## Helper functions
+
+### formHaveMessagesOfType
+
+After validation, you can user `formHaveMessagesOfType`-function to check if the listed messages has some sort of messages, like:
 
 Please check [fully functional demo](https://github.com/mindhivefi/ts-form-validation-demo.) for this example in its own repo.

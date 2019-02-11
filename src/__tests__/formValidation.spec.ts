@@ -1,14 +1,9 @@
-import {
-  validateFormFields,
-  MessageType,
-  DEFAULT_ERRORMESSAGE_FIELD_IS_REQUIRED,
-  FormValidationMessageCode,
-} from '../';
+import { DEFAULT_ERRORMESSAGE_FIELD_IS_REQUIRED, FormValidationMessageCode, MessageType, validateForm } from '../';
 
 describe('Handling form validation', () => {
   it('Will not validate, if field is not set to filled', () => {
     expect(
-      validateFormFields({
+      validateForm({
         values: {
           a: '',
         },
@@ -32,7 +27,7 @@ describe('Handling form validation', () => {
 
   it('Will fail if required field is not filled', () => {
     expect(
-      validateFormFields({
+      validateForm({
         values: {
           a: undefined,
         },
@@ -64,7 +59,7 @@ describe('Handling form validation', () => {
 
   it('Will fail if required field is empty', () => {
     expect(
-      validateFormFields({
+      validateForm({
         values: {
           a: '',
         },
@@ -97,7 +92,7 @@ describe('Handling form validation', () => {
   describe('Custom validation function', () => {
     it('Custom Validation Function will match', () => {
       expect(
-        validateFormFields({
+        validateForm({
           values: {
             a: '123',
           },
@@ -125,7 +120,7 @@ describe('Handling form validation', () => {
 
     it('Custom Validation Function will fail', () => {
       expect(
-        validateFormFields({
+        validateForm({
           values: {
             a: '123',
           },
@@ -160,7 +155,7 @@ describe('Handling form validation', () => {
   describe('Form Validation Function', () => {
     it('will handle succeed validation', () => {
       expect(
-        validateFormFields({
+        validateForm({
           values: {
             a: '123',
             b: '123',
@@ -198,7 +193,7 @@ describe('Handling form validation', () => {
 
     it('will handle failed validation', () => {
       expect(
-        validateFormFields({
+        validateForm({
           values: {
             a: '123',
             b: '234',
@@ -253,10 +248,10 @@ describe('Handling form validation', () => {
     });
   });
 
-  describe('Form Valid State Chekcs', () => {
+  describe('Form Valid State Checks', () => {
     it('will treat form valid, if all fields are valid event if they are not marked filled', () => {
       expect(
-        validateFormFields({
+        validateForm({
           values: {
             a: '123',
             b: '234',
@@ -287,9 +282,9 @@ describe('Handling form validation', () => {
     });
   });
 
-  it('will treat form invalid, if some o fields are not event if they are not marked filled', () => {
+  it('will treat form invalid, if some of fields are not even if they are not marked filled', () => {
     expect(
-      validateFormFields({
+      validateForm({
         values: {
           a: 'ABC',
           b: '',
@@ -316,6 +311,47 @@ describe('Handling form validation', () => {
       },
       messages: {},
       isFormValid: false,
+    });
+  });
+
+  it('will treat form valid, if it only have other messages than errors', () => {
+    expect(
+      validateForm({
+        values: {
+          a: '123',
+          b: '234',
+        },
+        filled: {
+          a: true,
+          b: true,
+        },
+        rules: {
+          fields: {
+            a: {
+              validate: (value: string) => ({ type: MessageType.WARNING, message: 'be careful' }),
+            },
+            b: {
+              validate: (value: string) => ({ type: MessageType.HINT, message: 'look into mirror' }),
+            },
+          },
+        },
+      }),
+    ).toEqual({
+      values: {
+        a: '123',
+        b: '234',
+      },
+      messages: {
+        a: {
+          message: 'be careful',
+          type: 'warning',
+        },
+        b: {
+          message: 'look into mirror',
+          type: 'hint',
+        },
+      },
+      isFormValid: true,
     });
   });
 });
