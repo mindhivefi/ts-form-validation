@@ -2,23 +2,23 @@ import { validateForm } from '../';
 
 describe('Form preprocessing', () => {
   it('If trim is set, whitespaces will be removed from start and end of the field value', () => {
-    expect(
-      validateForm({
-        values: {
-          a: '  cat  ',
-        },
-        filled: {
-          a: true,
-        },
-        rules: {
-          fields: {
-            a: {
-              trim: true,
-            },
+    const input = {
+      values: {
+        a: '  cat  ',
+      },
+      filled: {
+        a: true,
+      },
+      rules: {
+        fields: {
+          a: {
+            trim: true,
           },
         },
-      }),
-    ).toEqual({
+      },
+    };
+    expect(validateForm(input)).toEqual({
+      ...input,
       values: {
         a: 'cat',
       },
@@ -28,23 +28,24 @@ describe('Form preprocessing', () => {
   });
 
   it('Will call preprocessor method if it defined for the field', () => {
-    expect(
-      validateForm({
-        values: {
-          a: 'cat',
-        },
-        filled: {
-          a: true,
-        },
-        rules: {
-          fields: {
-            a: {
-              preprocess: (value: any) => `${value}fish`,
-            },
+    const input = {
+      values: {
+        a: 'cat',
+      },
+      filled: {
+        a: true,
+      },
+      rules: {
+        fields: {
+          a: {
+            preprocess: (value: any) => `${value}fish`,
           },
         },
-      }),
-    ).toEqual({
+      },
+    };
+
+    expect(validateForm(input)).toEqual({
+      ...input,
       values: {
         a: 'catfish',
       },

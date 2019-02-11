@@ -1,6 +1,6 @@
 # ts-form-validation
 
-This is a simple package to do form validation using Typescript's magnificent strong typing features. Framework focuses give a uniform architecture for validating a form fields and a form as a whole with a proper state validation. To do actual field type validations, I recommend to use this library besided some other such as [valide -library](https://www.npmjs.com/package/validator) or some other to actiel fields validity checks.
+This is a simple package to do form validation using Typescript's magnificent strong typing features. Framework focuses give an uniform architecture for validating a form fields and a form as a whole with a proper state validation. To do actual field type validations, I recommend to use this library besided some other such as [validator -library](https://www.npmjs.com/package/validator) or some other to actiel fields validity checks.
 
 ## Installation
 
@@ -44,12 +44,21 @@ const rules: FormValidationRules<RegisterForm> {
     displayName: {
       required: true,
       trim: true,
+      validate: (value: string) =>
+        !validator.isLength(value, { min: 5, max: 30 }) && {
+          type: MessageType.ERROR,
+          message: 'Display name must be between 5 to 30 characters in length.',
+        },
     },
     email: {
       required: true,
       trim: true,
       // We are using validator -library here to to actual email -check
-      validate: (value: any) => validator.isEmail(value)
+      validate: (value: string) =>
+        !validator.isEmail(value) && {
+          type: MessageType.ERROR,
+          message: 'Please give a valid email address',
+        },
     },
     password1: {
       required: true,
@@ -63,39 +72,30 @@ const rules: FormValidationRules<RegisterForm> {
 };
 ```
 
-Now you have the basic checking for form fields. All fields exept the photoURL -fields are required. Notice that `isValidEmail` and `isValidPassword` -functions are here imaginary, you can use some library or do your own implementation to handle the actual type checking. This framework only helps you with the structyre and strong typing.
+Now you have the basic checking for form fields. All fields except the `photoURL` -field are required. Notice that `validator.isEmail` and `validator.isLength` -functions are here imported from validator -library, which is specialized to check correctes of a single values. You can use validator library, any other checker or do your own checkers with `ts-form-validation`. This framework only helps you with the structure and strong typing.
 
 ### 3. Validation rule to check interdependant rules on form
 
-On registration form, it is important that the user will write the same password twice. This requires the code to match values between to different fields. This can be fone with `validateForm` -event handler. So we will add a handler for that to rules object:
+On registration form, it is important that the user will write the same password twice. This requires the code to match values between to different fields. This can be done with `validateForm` -event handler. So we will add a handler for that to rules object:
 
 ```typescript
 const rules: FormValidationRules<RegisterForm> {
   validateForm: form => {
-    const { filled, values, isFormValid } = form;
+    const messages = {};
 
-      // If user has not yet given the input for fields, we will do no validation
-      if (!(filled.password1 && filled.password2)) {
-        return false;
-      }
-
-      // Do the actual check if password match
-      if (values.password1 === values.password2) {
-        return false;
-      }
-
+    // Do not make checking if user has not yet filled both fields
+    if (form.filled.password1 && form.filled.password2 && form.values.password1 !== form.values.password2) {
       return {
-        isFormValid: false,
-        messages: {
-          password1: 'Please check the password',
-          password2: 'Please check the password',
-        }
+        ...form,
+        messages,
         formMessage: {
           type: MessageType.ERROR,
-          message: 'Passwords do not match',
-        }
-      }
-    },
+          message: 'Password do not match',
+        },
+      };
+    }
+    return { ...form, messages };
+  },
   // Field definitions continue here
   fields: {
     displayName: {
@@ -139,8 +139,11 @@ It is possible to do basic trimming for input or add your own pre processor even
   email: {
     required: true,
     trim: true,
-    validate: (value: any) => isValidEmail(value)
-  },
+    validate: (value: string) =>
+        !validator.isEmail(value) && {
+          type: MessageType.ERROR,
+          message: 'Please give a valid email address',
+        },
 ```
 
 To add a custom preprocessor, just add event `preprocess`-event handler to field like this:
@@ -151,8 +154,9 @@ To add a custom preprocessor, just add event `preprocess`-event handler to field
     trim: true,
     preprocess: (value: string) => value.toUppercase(),
   },
-You can use trim and custom event handler together. When you use trim also, the value that your custom event handler will receive will already be trimmed.
 ```
+
+You can use trim and custom event handler together. When you use trim also, the value that your custom event handler will receive will already be trimmed.
 
 ### 5. Filled - letting the user to finnish writing before validating
 
@@ -168,39 +172,129 @@ interface State {
 }
 
 export default class RegisterScreen extends React.Component<any, State> {
-  public static = {
-    form: {
-      // Let's define the initial values for the form fields
-      values: {
+  public state: State = {
+    // Initialize form
+    form: initForm<RegisterForm>(
+      {
         displayName: '',
         email: '',
         password1: '',
         password2: '',
         photoURL: '',
       },
-      // Initally no field is filled by the user
-      filled: {},
-      // we will use the rules defined before
       rules,
-    },
+    ),
   };
 
   public render() {
-    const {
-      form: { values, filled, messages },
-    } = this.state;
+    const { classes } = this.props;
+    const { formMessage, isFormValid } = this.state.form;
 
     return (
-      <>
-        <input onChange={this.handleChange('displayName')} value={values.displayName} />
-        {this.renderMessage(displayName)}
-      </>
+      <Paper className={classes.container}>
+        <Typography variant="h3" gutterBottom>
+          Register form example
+        </Typography>
+        {formMessage && (
+          <FormHelperText error={formMessage.type === MessageType.ERROR}>{formMessage.message}</FormHelperText>
+        )}
+        {this.renderField('displayName', 'Display name')}
+        {this.renderField('email', 'Email')}
+        {this.renderField('password1', 'Password', { type: 'password' })}
+        {this.renderField('password2', 'Password again', { type: 'password' })}
+
+        <Button color="primary" variant="contained" disabled={!isFormValid} onClick={() => alert('Form ready to go!')}>
+          Register
+        </Button>
+      </Paper>
     );
   }
+
+  /**
+   * Render a single form input field with all spices
+   */
+  private renderField = (key: keyof RegisterForm, label: string, props?: Partial<TextFieldProps>) => {
+    const { classes } = this.props;
+
+    const {
+      values,
+      messages: { [key]: message },
+    } = this.state.form;
+    return (
+      <>
+        <TextField
+          {...props}
+          id={key}
+          label={label}
+          className={classes.textField}
+          value={values[key]}
+          onBlur={this.handleBlur(key)}
+          onChange={this.handleChange(key)}
+          margin="normal"
+          variant="outlined"
+        />
+        {message && <FormHelperText error={message.type === MessageType.ERROR}>{message.message}</FormHelperText>}
+      </>
+    );
+  };
+
+  private handleChange = (key: keyof RegisterForm) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    const values = {
+      ...this.state.form.values,
+      [key]: event.target.value,
+    };
+
+    const form = validateForm(
+      {
+        ...this.state.form,
+        values,
+      },
+      {
+        // Disable preprocess while validating when writing
+        usePreprocessor: false,
+      },
+    );
+
+    this.setState({
+      form,
+    });
+  };
+
+  private handleBlur = (key: keyof RegisterForm) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    // set field filled after blur, means that the field as been set once
+    let form = { ...this.state.form };
+    const filled = {
+      ...form.filled,
+      [key]: true,
+    };
+
+    form = validateForm({
+      ...this.state.form,
+      filled,
+    });
+
+    this.setState({
+      form,
+    });
+  };
 }
 ```
 
 ## Helper functions
+
+### initForm
+
+With init form, you can initialize form with required fields, so that you can set up the minimun required:
+
+```typescript
+initForm<T>(
+      {
+        // initial values for fields
+      },
+      rules,
+    ),
+
+```
 
 ### formHaveMessagesOfType
 

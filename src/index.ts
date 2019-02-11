@@ -1,5 +1,5 @@
 /**
- * # td-form-validation
+ * # ts-form-validation
  *
  * A simple form validation library for typescript users.
  *
@@ -31,11 +31,23 @@ export interface FieldValidator {
 }
 
 /**
+ * Initialize form with default set
+ */
+export const initForm = <T>(values: T, rules: FormValidationRules<T>): Form<T> => ({
+  values,
+  filled: {},
+  messages: {},
+  rules,
+  isFormValid: false,
+});
+
+export interface Form<T> extends InputForm<T>, ValidatedForm<T> {}
+/**
  * Definition of the form to be validated
  */
-export interface Form<T> {
+export interface InputForm<T> {
   /**
-   * Current form values to be validated
+   * Current form values
    *
    * @type {T}
    * @memberof Form
@@ -57,6 +69,7 @@ export interface Form<T> {
    */
   rules: FormValidationRules<T>;
 }
+
 type BooleanMap<T> = { [P in keyof T]?: boolean };
 type MapType<T, U> = { [P in keyof T]?: U };
 
@@ -116,7 +129,7 @@ export type MessageFields<T> = MapType<T, MessageField>;
  */
 export type FilledFormFields<T> = Partial<BooleanMap<T>>;
 
-export interface FormValidationResponse<T> {
+export interface ValidatedForm<T> {
   /**
    * Form values after validation. These values can be altered by the preprocessing.
    */
@@ -192,15 +205,12 @@ export interface ValidateFormOptions {
  *
  * @param form The form info for controlling validation
  * @param options: Extra options to control validation process
- * @returns {FormValidationResponse<T>}
+ * @returns {ValidatedForm<T>}
  */
-export function validateForm<T>(
-  form: Form<T>,
-  options: ValidateFormOptions = { usePreprocessor: true },
-): FormValidationResponse<T> {
+export function validateForm<T>(form: InputForm<T>, options: ValidateFormOptions = { usePreprocessor: true }): Form<T> {
   const { values, filled, rules } = form;
 
-  let messages = {} as MessageFields<T>;
+  const messages = {} as MessageFields<T>;
   let isFormValid = true;
 
   if (rules.fields) {
@@ -242,14 +252,19 @@ export function validateForm<T>(
   }
 
   if (rules.validateForm) {
+    // Erase possible old form message
+    const formCopy = { ...form } as Form<T>;
+    delete formCopy.formMessage;
+
     const result = rules.validateForm({ isFormValid, values, filled });
-    if (!result.isFormValid) {
-      result.messages = { ...messages, ...result.messages };
-      result.isFormValid = false;
+
+    if (result.formMessage && result.isFormValid) {
+      result.isFormValid = result.formMessage.type !== MessageType.ERROR;
     }
-    return { values, ...result };
+    return { ...formCopy, ...result, values, messages: { ...messages, ...result.messages } };
   }
   return {
+    ...form,
     values,
     messages,
     isFormValid,
@@ -262,7 +277,7 @@ export function validateForm<T>(
  * @param response Form response object
  * @param type Message type type be checked
  */
-export const formHaveMessagesOfType = (response: FormValidationResponse<any>, type: MessageType): boolean => {
+export const formHaveMessagesOfType = (response: ValidatedForm<any>, type: MessageType): boolean => {
   if (response.messages) {
     for (const key in response.messages) {
       const field = response.messages[key];

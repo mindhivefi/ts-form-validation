@@ -10,7 +10,9 @@
     "build": "tsc",
     "lint": "tslint --fix ./src/**/*.ts*",
     "test": "jest --verbose",
-    "test:watch": "jest --watch --verbose ."
+    "test:watch": "jest --watch --verbose .",
+    "predeploy": "yarn build",
+    "deploy": "npm deploy"
   },
   "repository": {
     "type": "git",
