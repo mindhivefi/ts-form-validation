@@ -30,7 +30,10 @@
     "typescript",
     "typing"
   ],
-  "author": "Ville Venäläinen / Mindhive Oy",
+  "author": {
+    "name": "Ville Venäläinen / Mindhive Oy",
+    "email": "ville@mindhive.fi"
+  },
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/mindhivefi/ts-form-validation/issues"
@@ -49,5 +52,8 @@
     "tslint": "5.12.1",
     "tslint-config-prettier": "1.18.0",
     "typescript": "3.3.3"
+  },
+  "directories": {
+    "lib": "lib"
   }
 }

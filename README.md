@@ -300,4 +300,4 @@ initForm<T>(
 
 After validation, you can user `formHaveMessagesOfType`-function to check if the listed messages has some sort of messages, like:
 
-Please check [fully functional demo](https://github.com/mindhivefi/ts-form-validation-demo.) for this example in its own repo.
+Please check [fully functional demo](https://github.com/mindhivefi/ts-form-validation-demo). for this example in its own repo.
