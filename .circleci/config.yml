@@ -69,6 +69,7 @@ workflows:
             tags:
               only: /^v.*/
       - deploy:
+          context: github-npm
           requires:
             - test
           filters:
