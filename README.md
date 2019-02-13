@@ -1,6 +1,6 @@
 # ts-form-validation
 
-This is a simple package to do form validation using Typescript's magnificent strong typing features. Framework focuses give an uniform architecture for validating a form fields and a form as a whole with a proper state validation. To do actual field type validations, it is recommended to use this library besides some other library such as [validator -library](https://www.npmjs.com/package/validator) or some other to actual fields validity checks.
+This is a simple library to do form validation using Typescript's magnificent strong typing features. Framework focuses give an uniform architecture for validating a form fields and a form as a whole with a proper state validation. To do actual field type validations, it is recommended to use this library besides some other library such as [validator -library](https://www.npmjs.com/package/validator).
 
 ## Installation
 
@@ -18,11 +18,11 @@ npm install ts-form-validation
 
 ## Using validator
 
-The whole validation is based on a type interface defined by you, whick will contain all the fields that are used in your form. This might be easier to explain with an example. Lets build a registration form:
+The whole validation is based on a type interface defined by you, which will contain all the fields that are used in your form. This might be easier to explain with an example. Lets build a registration form:
 
 ### 1. Define the type for the form
 
-Define a interface which will contain all fields that are in your form:
+Define an interface which will contain all fields that are used in your form:
 
 ```typescript
 interface RegisterForm {
@@ -72,7 +72,7 @@ const rules: FormValidationRules<RegisterForm> {
 };
 ```
 
-Now you have the basic checking for form fields. All fields except the `photoURL` -field are required. Notice that `validator.isEmail` and `validator.isLength` -functions are here imported from validator -library, which is specialized to check correctes of a single values. You can use validator library, any other checker or do your own checkers with `ts-form-validation`. This framework only helps you with the structure and strong typing.
+Now we have the basic checking rules for form fields. All fields except the `photoURL` -field are required. Notice that `validator.isEmail` and `validator.isLength` -functions are imported from validator -library, which is specialized to check correctnes of a single values. You can use validator library, any other checker or do your own checkers with `ts-form-validation`. This framework only helps you with the structure and strong typing.
 
 ### 3. Validation rule to check interdependant rules on form
 
