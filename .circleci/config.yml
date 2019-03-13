@@ -7,7 +7,7 @@ version: 2
 defaults: &defaults
   working_directory: ~/repo
   docker:
-    - image: circleci/node:8.9.1
+    - image: circleci/node:8.9.4
 
 jobs:
   build:
@@ -53,20 +53,13 @@ jobs:
 
 workflows:
   version: 2
-  test-deploy:
+  deploy-master-to-npm:
     jobs:
-      - build:
-          filters:
-            tags:
-              only: /^v.*/
+      - build
       - test:
           requires:
             - build
-          filters:
-            tags:
-              only: /^v.*/
       - deploy:
-          context: github-npm
           requires:
             - test
           filters:
