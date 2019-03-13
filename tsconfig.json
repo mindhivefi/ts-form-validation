@@ -20,5 +20,12 @@
     "suppressImplicitAnyIndexErrors": true,
     "target": "es5"
   },
-  "exclude": ["coverage", "jest", "jest.config.js", "lib", "node_modules", "release.config.js"]
+  "include": ["src"],
+  "exclude": [
+    "commitlint.config.js",
+    "coverage",
+    "jest.config.js",
+    "lib",
+    "node_modules"
+  ]
 }

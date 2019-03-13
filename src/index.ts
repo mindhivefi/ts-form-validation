@@ -16,6 +16,13 @@ export interface FieldValidator {
    * Is field required. Default is false.
    */
   required?: boolean;
+
+  /**
+   * Message text to be shown when field has no value but is required. If this field has no value,
+   * the default value set on rules will be used or if that is not available the internal default
+   * value will be shown.
+   */
+  requiredText?: string | MessageFunction;
   /**
    * Trim whitespaces from string's begining and end.
    */
@@ -25,15 +32,20 @@ export interface FieldValidator {
    */
   preprocess?: (value: any) => any;
   /**
-   * Validate Fields given value
+   * Validate Fields given value.
+   *
+   * @returns {false | ValidationMessage} Validate if the field should have some level of message. If no validation message is given, the method must return ´false´.
    */
-  validate?: (value: any) => MessageField;
+  validate?: (value: any) => false | ValidationMessage;
 }
 
 /**
  * Initialize form with default set
  */
-export const initForm = <T>(values: T, rules: FormValidationRules<T>): Form<T> => ({
+export const initForm = <T>(
+  values: T,
+  rules: FormValidationRules<T>,
+): Form<T> => ({
   values,
   filled: {},
   messages: {},
@@ -76,15 +88,35 @@ type MapType<T, U> = { [P in keyof T]?: U };
 export type FieldValidatorMap<T> = Partial<{ [P in keyof T]: FieldValidator }>;
 
 export enum MessageType {
+  /**
+   * Field or form contains an error. If any validator, will return a message with this
+   * code, the form will be treated as invalid.
+   */
   ERROR = 'error',
+  /**
+   * Field or form contains a state for what user should be warned. Form can still be
+   * be valid event if it contains warnings.
+   */
   WARNING = 'warning',
+  /**
+   * Field or form contains a state for what user should be hinted. Form can be treaded valid
+   * when containing this kind of messages.
+   */
   HINT = 'hint',
+
+  /**
+   * Error message given, when validator callback fails with the exception. Exception error
+   * message will be included into message.
+   */
+  VALIDATION_ERROR = 'validation_error',
 }
 
 export enum FormValidationMessageCode {
   NONE = 0,
   FIELD_IS_REQUIRED = 1,
   CUSTOM = 100,
+  INTERNAL_FIELD_NOT_FOUND = 1000,
+  INTERNAL_ERROR = 9999,
 }
 
 /**
@@ -166,6 +198,7 @@ export interface RequiredFieldValidationFields<T> {
   isFormValid: boolean;
 }
 
+export type MessageFunction = () => string;
 /**
  * Rule definitions for form validation
  */
@@ -177,7 +210,13 @@ export interface FormValidationRules<T> {
     form: RequiredFieldValidationFields<T>,
   ) => {
     isFormValid: boolean;
+    /**
+     * Field specific messages
+     */
     messages: MessageFields<T>;
+    /**
+     * Message for the whole form
+     */
     formMessage?: ValidationMessage;
   };
 
@@ -185,6 +224,17 @@ export interface FormValidationRules<T> {
    * Field specific validators
    */
   fields?: Partial<FieldValidatorMap<T>>;
+
+  /**
+   * Default message texts used on validation cases triggered
+   * internally by the form validator
+   */
+  defaultMessages?: {
+    /**
+     * Message text shown when field is required, but has no value
+     */
+    requiredField?: string | MessageFunction;
+  };
 }
 
 /**
@@ -207,7 +257,10 @@ export interface ValidateFormOptions {
  * @param options: Extra options to control validation process
  * @returns {ValidatedForm<T>}
  */
-export function validateForm<T>(form: InputForm<T>, options: ValidateFormOptions = { usePreprocessor: true }): Form<T> {
+export function validateForm<T>(
+  form: InputForm<T>,
+  options: ValidateFormOptions = { usePreprocessor: true },
+): Form<T> {
   const { values, filled, rules } = form;
 
   const messages = {} as MessageFields<T>;
@@ -219,17 +272,22 @@ export function validateForm<T>(form: InputForm<T>, options: ValidateFormOptions
       if (validator) {
         const field = values[fieldKey];
         // Do preprocessing first
-        const value = options.usePreprocessor ? preprocessFormValue(validator!, field) : field;
+        const value = options.usePreprocessor
+          ? preprocessFormValue(validator!, field)
+          : field;
         values[fieldKey] = value;
 
         // Check if required field
-        if (validator.required && (value === undefined || (typeof value === 'string' && value.length === 0))) {
+        if (
+          validator.required &&
+          (value === undefined ||
+            (typeof value === 'string' && value.length === 0))
+        ) {
           if (filled[fieldKey]) {
-            messages[fieldKey] = {
-              type: MessageType.ERROR,
-              code: FormValidationMessageCode.FIELD_IS_REQUIRED,
-              message: DEFAULT_ERRORMESSAGE_FIELD_IS_REQUIRED,
-            };
+            messages[fieldKey] = getRequiredFieldErrorMessage<T>(
+              rules,
+              fieldKey,
+            );
           }
           isFormValid = false;
           continue;
@@ -261,7 +319,12 @@ export function validateForm<T>(form: InputForm<T>, options: ValidateFormOptions
     if (result.formMessage && result.isFormValid) {
       result.isFormValid = result.formMessage.type !== MessageType.ERROR;
     }
-    return { ...formCopy, ...result, values, messages: { ...messages, ...result.messages } };
+    return {
+      ...formCopy,
+      ...result,
+      values,
+      messages: { ...messages, ...result.messages },
+    };
   }
   return {
     ...form,
@@ -277,7 +340,10 @@ export function validateForm<T>(form: InputForm<T>, options: ValidateFormOptions
  * @param response Form response object
  * @param type Message type type be checked
  */
-export const formHaveMessagesOfType = (response: ValidatedForm<any>, type: MessageType): boolean => {
+export const formHaveMessagesOfType = (
+  response: ValidatedForm<any>,
+  type: MessageType,
+): boolean => {
   if (response.messages) {
     for (const key in response.messages) {
       const field = response.messages[key];
@@ -288,6 +354,43 @@ export const formHaveMessagesOfType = (response: ValidatedForm<any>, type: Messa
   }
   return false;
 };
+
+function getRequiredFieldErrorMessage<T>(
+  rules: FormValidationRules<T>,
+  fieldKey: keyof T,
+): MessageField {
+  try {
+    const fields = rules.fields || ({} as T);
+    const field = fields[fieldKey] as FieldValidator;
+    if (!field) {
+      return {
+        type: MessageType.VALIDATION_ERROR,
+        code: FormValidationMessageCode.INTERNAL_FIELD_NOT_FOUND,
+        message: '',
+      };
+    }
+
+    let message =
+      field.requiredText ||
+      (rules.defaultMessages && rules.defaultMessages.requiredField) ||
+      DEFAULT_ERRORMESSAGE_FIELD_IS_REQUIRED;
+
+    if (typeof message === 'function') {
+      message = message();
+    }
+    return {
+      type: MessageType.ERROR,
+      code: FormValidationMessageCode.FIELD_IS_REQUIRED,
+      message,
+    };
+  } catch (error) {
+    return {
+      type: MessageType.VALIDATION_ERROR,
+      code: FormValidationMessageCode.INTERNAL_ERROR,
+      message: error,
+    };
+  }
+}
 
 /**
  * Do proprocessing for the field value

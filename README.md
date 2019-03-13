@@ -196,14 +196,21 @@ export default class RegisterScreen extends React.Component<any, State> {
           Register form example
         </Typography>
         {formMessage && (
-          <FormHelperText error={formMessage.type === MessageType.ERROR}>{formMessage.message}</FormHelperText>
+          <FormHelperText error={formMessage.type === MessageType.ERROR}>
+            {formMessage.message}
+          </FormHelperText>
         )}
         {this.renderField('displayName', 'Display name')}
         {this.renderField('email', 'Email')}
         {this.renderField('password1', 'Password', { type: 'password' })}
         {this.renderField('password2', 'Password again', { type: 'password' })}
 
-        <Button color="primary" variant="contained" disabled={!isFormValid} onClick={() => alert('Form ready to go!')}>
+        <Button
+          color="primary"
+          variant="contained"
+          disabled={!isFormValid}
+          onClick={() => alert('Form ready to go!')}
+        >
           Register
         </Button>
       </Paper>
@@ -213,7 +220,11 @@ export default class RegisterScreen extends React.Component<any, State> {
   /**
    * Render a single form input field with all spices
    */
-  private renderField = (key: keyof RegisterForm, label: string, props?: Partial<TextFieldProps>) => {
+  private renderField = (
+    key: keyof RegisterForm,
+    label: string,
+    props?: Partial<TextFieldProps>,
+  ) => {
     const { classes } = this.props;
 
     const {
@@ -233,12 +244,18 @@ export default class RegisterScreen extends React.Component<any, State> {
           margin="normal"
           variant="outlined"
         />
-        {message && <FormHelperText error={message.type === MessageType.ERROR}>{message.message}</FormHelperText>}
+        {message && (
+          <FormHelperText error={message.type === MessageType.ERROR}>
+            {message.message}
+          </FormHelperText>
+        )}
       </>
     );
   };
 
-  private handleChange = (key: keyof RegisterForm) => (event: React.ChangeEvent<HTMLInputElement>) => {
+  private handleChange = (key: keyof RegisterForm) => (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const values = {
       ...this.state.form.values,
       [key]: event.target.value,
@@ -260,7 +277,9 @@ export default class RegisterScreen extends React.Component<any, State> {
     });
   };
 
-  private handleBlur = (key: keyof RegisterForm) => (event: React.ChangeEvent<HTMLInputElement>) => {
+  private handleBlur = (key: keyof RegisterForm) => (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     // set field filled after blur, means that the field as been set once
     let form = { ...this.state.form };
     const filled = {
@@ -296,8 +315,51 @@ initForm<T>(
 
 ```
 
+### Custom messages for validation
+
+Currently validator has only a single internal message that is given as result. This will hapen when you use ´required´ on
+form validation rules. To customize this, you can add ´requiredText´-field into field validator:
+
+```typescript
+currency: {
+    required: true,
+    requiredText: 'You must give the currency code here',
+    trim: true,
+    preprocess: (value: string) => value.toUppercase(),
+  },
+```
+
+If your system have multiple localizations, you might prefer to set a function into requiredText, which will give you a full control over message to be shown:
+
+```typescript
+currency: {
+    required: true,
+    requiredText: () => 'You must give the currency code here',
+    trim: true,
+    preprocess: (value: string) => value.toUppercase(),
+  },
+```
+
+To set a new default message to be used in all fields that do not have explicit text override like done above, you can set default
+message texts or message functions on rule -objects top level:
+
+```typescript
+const rules: FormValidationRules<RegisterForm> {
+  ...
+  defaultMessages: {
+    requiredField: () => 'Hey, you missed this field!';
+  };
+}
+```
+
 ### formHaveMessagesOfType
 
 After validation, you can user `formHaveMessagesOfType`-function to check if the listed messages has some sort of messages, like:
+
+```typescript
+if formHaveMessagesOfType(form, MessageType.WARNING) {
+  // do something handy
+}
+```
 
 Please check [fully functional demo](https://github.com/mindhivefi/ts-form-validation-demo). for this example in its own repo.

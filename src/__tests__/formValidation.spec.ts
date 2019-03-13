@@ -30,61 +30,187 @@ describe('Handling form validation', () => {
     });
   });
 
-  it('Will fail if required field is not filled', () => {
-    const input = {
-      values: {
-        a: undefined,
-      },
-      filled: {
-        a: true,
-      },
-      rules: {
-        fields: {
-          a: {
-            required: true,
+  describe('Required fields', () => {
+    it('Will fail if required field is not filled', () => {
+      const input = {
+        values: {
+          a: undefined,
+        },
+        filled: {
+          a: true,
+        },
+        rules: {
+          fields: {
+            a: {
+              required: true,
+            },
           },
         },
-      },
-    };
-    expect(validateForm(input)).toEqual({
-      ...input,
-      messages: {
-        a: {
-          type: MessageType.ERROR,
-          code: FormValidationMessageCode.FIELD_IS_REQUIRED,
-          message: DEFAULT_ERRORMESSAGE_FIELD_IS_REQUIRED,
+      };
+      expect(validateForm(input)).toEqual({
+        ...input,
+        messages: {
+          a: {
+            type: MessageType.ERROR,
+            code: FormValidationMessageCode.FIELD_IS_REQUIRED,
+            message: DEFAULT_ERRORMESSAGE_FIELD_IS_REQUIRED,
+          },
         },
-      },
-      isFormValid: false,
+        isFormValid: false,
+      });
     });
-  });
 
-  it('Will fail if required field is empty', () => {
-    const input = {
-      values: {
-        a: '',
-      },
-      filled: {
-        a: true,
-      },
-      rules: {
-        fields: {
-          a: {
-            required: true,
+    it('Will fail if required field is empty', () => {
+      const input = {
+        values: {
+          a: '',
+        },
+        filled: {
+          a: true,
+        },
+        rules: {
+          fields: {
+            a: {
+              required: true,
+            },
           },
         },
-      },
-    };
-    expect(validateForm(input)).toEqual({
-      ...input,
-      messages: {
-        a: {
-          type: MessageType.ERROR,
-          code: FormValidationMessageCode.FIELD_IS_REQUIRED,
-          message: DEFAULT_ERRORMESSAGE_FIELD_IS_REQUIRED,
+      };
+      expect(validateForm(input)).toEqual({
+        ...input,
+        messages: {
+          a: {
+            type: MessageType.ERROR,
+            code: FormValidationMessageCode.FIELD_IS_REQUIRED,
+            message: DEFAULT_ERRORMESSAGE_FIELD_IS_REQUIRED,
+          },
         },
-      },
-      isFormValid: false,
+        isFormValid: false,
+      });
+    });
+
+    it('Will show user defined error message defined in the fields rule ', () => {
+      const input = {
+        values: {
+          a: '',
+        },
+        filled: {
+          a: true,
+        },
+        rules: {
+          fields: {
+            a: {
+              required: true,
+              requiredText: 'Not good',
+            },
+          },
+        },
+      };
+      expect(validateForm(input)).toEqual({
+        ...input,
+        messages: {
+          a: {
+            type: MessageType.ERROR,
+            code: FormValidationMessageCode.FIELD_IS_REQUIRED,
+            message: 'Not good',
+          },
+        },
+        isFormValid: false,
+      });
+    });
+
+    it('Will show default error message for required field when it is defined in rules default messages.', () => {
+      const input = {
+        values: {
+          a: '',
+        },
+        filled: {
+          a: true,
+        },
+        rules: {
+          fields: {
+            a: {
+              required: true,
+            },
+          },
+          defaultMessages: {
+            requiredField: 'Default not good',
+          },
+        },
+      };
+      expect(validateForm(input)).toEqual({
+        ...input,
+        messages: {
+          a: {
+            type: MessageType.ERROR,
+            code: FormValidationMessageCode.FIELD_IS_REQUIRED,
+            message: 'Default not good',
+          },
+        },
+        isFormValid: false,
+      });
+    });
+
+    it('Will show user defined error function content defined in the fields rule ', () => {
+      const input = {
+        values: {
+          a: '',
+        },
+        filled: {
+          a: true,
+        },
+        rules: {
+          fields: {
+            a: {
+              required: true,
+              requiredText: () => 'Not good',
+            },
+          },
+        },
+      };
+      expect(validateForm(input)).toEqual({
+        ...input,
+        messages: {
+          a: {
+            type: MessageType.ERROR,
+            code: FormValidationMessageCode.FIELD_IS_REQUIRED,
+            message: 'Not good',
+          },
+        },
+        isFormValid: false,
+      });
+    });
+
+    it('Will show default error function content for required field when it is defined in rules default messages.', () => {
+      const input = {
+        values: {
+          a: '',
+        },
+        filled: {
+          a: true,
+        },
+        rules: {
+          fields: {
+            a: {
+              required: true,
+            },
+          },
+          defaultMessages: {
+            requiredField: () => 'Default not good',
+          },
+        },
+      };
+      expect(validateForm(input)).toEqual({
+        ...input,
+        messages: {
+          a: {
+            type: MessageType.ERROR,
+            code: FormValidationMessageCode.FIELD_IS_REQUIRED,
+            message: 'Default not good',
+          },
+        },
+        isFormValid: false,
+      });
     });
   });
 
@@ -102,7 +228,9 @@ describe('Handling form validation', () => {
             a: {
               required: true,
               validate: (value: any) =>
-                value && value === '123' ? false : { type: MessageType.ERROR, message: 'Douh!' },
+                value && value === '123'
+                  ? false
+                  : { type: MessageType.ERROR, message: 'Douh!' },
             },
           },
         },
@@ -127,7 +255,9 @@ describe('Handling form validation', () => {
             a: {
               required: true,
               validate: (value: any) =>
-                value && value === 'wrong' ? false : { type: MessageType.ERROR, message: 'Douh!' },
+                value && value === 'wrong'
+                  ? false
+                  : { type: MessageType.ERROR, message: 'Douh!' },
             },
           },
         },
@@ -343,6 +473,34 @@ describe('Handling form validation', () => {
     });
   });
 
+  it('will treat form as valid, if all field validators give valid result event if the fields are not marked as filled', () => {
+    const input = {
+      values: {
+        a: 'ABC',
+        b: 'def',
+      },
+      filled: {
+        a: false,
+        b: false,
+      },
+      rules: {
+        fields: {
+          a: {
+            required: true,
+          },
+          b: {
+            required: true,
+          },
+        },
+      },
+    };
+    expect(validateForm(input)).toEqual({
+      ...input,
+      messages: {},
+      isFormValid: true,
+    });
+  });
+
   it('will treat form valid, if it only have other messages than errors', () => {
     const input = {
       values: {
@@ -356,10 +514,16 @@ describe('Handling form validation', () => {
       rules: {
         fields: {
           a: {
-            validate: (value: string) => ({ type: MessageType.WARNING, message: 'be careful' }),
+            validate: (value: string) => ({
+              type: MessageType.WARNING,
+              message: 'be careful',
+            }),
           },
           b: {
-            validate: (value: string) => ({ type: MessageType.HINT, message: 'look into mirror' }),
+            validate: (value: string) => ({
+              type: MessageType.HINT,
+              message: 'look into mirror',
+            }),
           },
         },
       },
