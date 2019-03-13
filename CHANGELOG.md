@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/mindhivefi/ts-form-validation/compare/v1.1.0...v1.1.1) (2019-03-13)
+
+
+### Bug Fixes
+
+* fix-gitignore-from-excluding-lib ([272bca8](https://github.com/mindhivefi/ts-form-validation/commit/272bca8))
+
 # [1.1.0](https://github.com/mindhivefi/ts-form-validation/compare/v1.0.0...v1.1.0) (2019-03-13)
 
 
