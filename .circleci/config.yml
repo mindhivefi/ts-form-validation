@@ -37,7 +37,7 @@ jobs:
           at: ~/repo
       - run:
           name: Run Tests
-          command: npm test
+          command: yarn test
   deploy:
     <<: *defaults
     steps:
@@ -45,7 +45,7 @@ jobs:
           at: ~/repo
       - run:
           name: Run build
-          command: npm build
+          command: yarn build
       - run:
           name: Publish package
           command: npx semantic-release --gh-token=$GITHUB_TOKEN --npm-token=$npm_TOKEN --gh-username=mindhivefi --npm-username=villevenalainen
