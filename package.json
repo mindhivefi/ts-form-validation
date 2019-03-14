@@ -14,7 +14,8 @@
     "semantic-release": "semantic-release",
     "predeploy": "yarn build",
     "deploy": "npm deploy",
-    "commit": "npx git-cz"
+    "commit": "npx git-cz",
+    "check-package": "tar tvf $(npm pack)"
   },
   "repository": {
     "type": "git",
@@ -92,7 +93,9 @@
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
-  "directories": {
-    "lib": "lib"
-  }
+  "files": [
+    "lib/index.js",
+    "lib/index.d.ts",
+    "lib/index.map"
+  ]
 }
