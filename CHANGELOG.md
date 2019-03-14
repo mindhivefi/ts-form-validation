@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/mindhivefi/ts-form-validation/compare/v1.1.1...v1.1.2) (2019-03-14)
+
+
+### Bug Fixes
+
+* force-rebuild-on-deploy ([c145cb9](https://github.com/mindhivefi/ts-form-validation/commit/c145cb9))
+
 ## [1.1.1](https://github.com/mindhivefi/ts-form-validation/compare/v1.1.0...v1.1.1) (2019-03-13)
 
 
