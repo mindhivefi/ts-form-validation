@@ -22,7 +22,7 @@ jobs:
       - run: npm install
       - run:
           name: Run build
-          command: npm build
+          command: yarn build
       - save_cache:
           paths:
             - node_modules
@@ -46,6 +46,9 @@ jobs:
       - run:
           name: Run build
           command: yarn build
+      - run:
+          name: Evaluate the package content
+          command: yarn check-package
       - run:
           name: Publish package
           command: npx semantic-release --gh-token=$GITHUB_TOKEN --npm-token=$npm_TOKEN --gh-username=mindhivefi --npm-username=villevenalainen
