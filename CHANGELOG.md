@@ -1,3 +1,10 @@
+## [1.1.4](https://github.com/mindhivefi/ts-form-validation/compare/v1.1.3...v1.1.4) (2019-03-14)
+
+
+### Bug Fixes
+
+* testing-lib ([3e46c31](https://github.com/mindhivefi/ts-form-validation/commit/3e46c31))
+
 ## [1.1.3](https://github.com/mindhivefi/ts-form-validation/compare/v1.1.2...v1.1.3) (2019-03-14)
 
 
