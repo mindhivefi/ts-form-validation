@@ -1,3 +1,10 @@
+## [1.1.5](https://github.com/mindhivefi/ts-form-validation/compare/v1.1.4...v1.1.5) (2019-03-15)
+
+
+### Bug Fixes
+
+* commonjs-module ([8e2a4bd](https://github.com/mindhivefi/ts-form-validation/commit/8e2a4bd))
+
 ## [1.1.4](https://github.com/mindhivefi/ts-form-validation/compare/v1.1.3...v1.1.4) (2019-03-14)
 
 
