@@ -42,10 +42,7 @@ export interface FieldValidator {
 /**
  * Initialize form with default set
  */
-export const initForm = <T>(
-  values: T,
-  rules: FormValidationRules<T>,
-): Form<T> => ({
+export const initForm = <T>(values: T, rules: FormValidationRules<T>): Form<T> => ({
   values,
   filled: {},
   messages: {},
@@ -257,12 +254,10 @@ export interface ValidateFormOptions {
  * @param options: Extra options to control validation process
  * @returns {ValidatedForm<T>}
  */
-export function validateForm<T>(
-  form: InputForm<T>,
-  options: ValidateFormOptions = { usePreprocessor: true },
-): Form<T> {
+// tslint:disable-next-line: cognitive-complexity
+export function validateForm<T>(form: InputForm<T>, options: ValidateFormOptions = { usePreprocessor: true }): Form<T> {
   const { values, filled, rules } = form;
-
+  // TODO refactor in to sub functions
   const messages = {} as MessageFields<T>;
   let isFormValid = true;
 
@@ -273,21 +268,15 @@ export function validateForm<T>(
         const field = values[fieldKey];
         // Do preprocessing first
         const value = options.usePreprocessor
-          ? preprocessFormValue(validator!, field)
+          ? // tslint:disable-next-line: no-useless-cast
+            preprocessFormValue(validator!, field)
           : field;
         values[fieldKey] = value;
 
         // Check if required field
-        if (
-          validator.required &&
-          (value === undefined ||
-            (typeof value === 'string' && value.length === 0))
-        ) {
+        if (validator.required && (value === undefined || (typeof value === 'string' && value.length === 0))) {
           if (filled[fieldKey]) {
-            messages[fieldKey] = getRequiredFieldErrorMessage<T>(
-              rules,
-              fieldKey,
-            );
+            messages[fieldKey] = getRequiredFieldErrorMessage<T>(rules, fieldKey);
           }
           isFormValid = false;
           continue;
@@ -340,10 +329,7 @@ export function validateForm<T>(
  * @param response Form response object
  * @param type Message type type be checked
  */
-export const formHaveMessagesOfType = (
-  response: ValidatedForm<any>,
-  type: MessageType,
-): boolean => {
+export const formHaveMessagesOfType = (response: ValidatedForm<any>, type: MessageType): boolean => {
   if (response.messages) {
     for (const key in response.messages) {
       const field = response.messages[key];
@@ -355,10 +341,7 @@ export const formHaveMessagesOfType = (
   return false;
 };
 
-function getRequiredFieldErrorMessage<T>(
-  rules: FormValidationRules<T>,
-  fieldKey: keyof T,
-): MessageField {
+function getRequiredFieldErrorMessage<T>(rules: FormValidationRules<T>, fieldKey: keyof T): MessageField {
   try {
     const fields = rules.fields || ({} as T);
     const field = fields[fieldKey] as FieldValidator;

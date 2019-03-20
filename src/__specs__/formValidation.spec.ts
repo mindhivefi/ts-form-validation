@@ -6,6 +6,7 @@ import {
   validateForm,
 } from '../';
 
+// tslint:disable-next-line: no-big-function
 describe('Handling form validation', () => {
   it('Will not validate, if field is not set to filled', () => {
     const input = {
@@ -134,6 +135,7 @@ describe('Handling form validation', () => {
             },
           },
           defaultMessages: {
+            // tslint:disable-next-line: no-duplicate-string
             requiredField: 'Default not good',
           },
         },
@@ -473,6 +475,7 @@ describe('Handling form validation', () => {
     });
   });
 
+  // tslint:disable-next-line: no-identical-functions
   it('will treat form as valid, if all field validators give valid result event if the fields are not marked as filled', () => {
     const input = {
       values: {
@@ -502,6 +505,52 @@ describe('Handling form validation', () => {
   });
 
   it('will treat form valid, if it only have other messages than errors', () => {
+    const input = {
+      values: {
+        a: '123',
+        b: '234',
+      },
+      filled: {
+        a: true,
+        b: true,
+      },
+      rules: {
+        fields: {
+          a: {
+            validate: (value: string) => ({
+              type: MessageType.WARNING,
+              // tslint:disable-next-line: no-duplicate-string
+              message: 'be careful',
+            }),
+          },
+          b: {
+            validate: (value: string) => ({
+              type: MessageType.HINT,
+              // tslint:disable-next-line: no-duplicate-string
+              message: 'look into mirror',
+            }),
+          },
+        },
+      },
+    };
+    expect(validateForm(input)).toEqual({
+      ...input,
+      messages: {
+        a: {
+          message: 'be careful',
+          type: 'warning',
+        },
+        b: {
+          message: 'look into mirror',
+          type: 'hint',
+        },
+      },
+      isFormValid: true,
+    });
+  });
+
+  // tslint:disable-next-line: no-identical-functions
+  it('will treat empty array as , if it only have other messages than errors', () => {
     const input = {
       values: {
         a: '123',

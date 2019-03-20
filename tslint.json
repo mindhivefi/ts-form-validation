@@ -1,12 +1,16 @@
 {
   "autoFixOnSave": true,
-  "extends": ["tslint:recommended", "tslint-config-prettier"],
+  "extends": ["tslint:recommended", "tslint-config-prettier", "tslint-sonarts"],
   "jsRules": {
     "no-console": false,
     "object-literal-sort-keys": false
   },
   "linterOptions": {
-    "exclude": ["lib/**/*.js", "node_modules/**/*.ts", "coverage/lcov-report/*.js"]
+    "exclude": [
+      "lib/**/*.js",
+      "node_modules/**/*.ts",
+      "coverage/lcov-report/*.js"
+    ]
   },
   "rules": {
     "forin": false,
@@ -16,7 +20,9 @@
     "no-bitwise": false,
     "no-console": false,
     "no-unused-expression": false,
-    "object-literal-sort-keys": false
+    "object-literal-sort-keys": false,
+    "ordered-imports": true,
+    "semicolon": [true, "always"]
   },
   "rulesDirectory": []
 }
