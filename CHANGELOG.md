@@ -1,3 +1,10 @@
+## [1.1.6](https://github.com/mindhivefi/ts-form-validation/compare/v1.1.5...v1.1.6) (2019-03-26)
+
+
+### Bug Fixes
+
+* home-page-link-changed-to-wiki ([164c486](https://github.com/mindhivefi/ts-form-validation/commit/164c486))
+
 ## [1.1.5](https://github.com/mindhivefi/ts-form-validation/compare/v1.1.4...v1.1.5) (2019-03-15)
 
 
