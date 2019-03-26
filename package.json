@@ -57,7 +57,7 @@
   "bugs": {
     "url": "https://github.com/mindhivefi/ts-form-validation/issues"
   },
-  "homepage": "https://github.com/mindhivefi/ts-form-validation#readme",
+  "homepage": "https://mindhivefi.github.io/ts-form-validation/",
   "jest": {
     "testEnvironment": "node"
   },
