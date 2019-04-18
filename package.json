@@ -73,12 +73,12 @@
     "jest": "24.x",
     "rimraf": "2.6.3",
     "semantic-release": "^15.13.3",
-    "semantic-release-cli": "4.1.0",
-    "ts-jest": "24.0.0",
-    "tslint": "5.14.0",
+    "semantic-release-cli": "4.1.2",
+    "ts-jest": "24.0.2",
+    "tslint": "5.15.0",
     "tslint-config-prettier": "1.18.0",
     "tslint-sonarts": "1.9.0",
-    "typescript": "3.3.3"
+    "typescript": "3.4.2"
   },
   "config": {
     "commitizen": {

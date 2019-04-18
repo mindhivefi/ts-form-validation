@@ -1,6 +1,6 @@
 # ts-form-validation
 
-[![CircleCI](https://circleci.com/gh/mindhivefi/ts-form-validation/tree/master.svg?style=svg)](https://circleci.com/gh/mindhivefi/ts-form-validation/tree/master)
+[![CircleCI](https://circleci.com/gh/mindhivefi/ts-form-validation/tree/master.svg?style=svg)](https://circleci.com/gh/mindhivefi/ts-form-validation/tree/master) [![Greenkeeper badge](https://badges.greenkeeper.io/mindhivefi/ts-form-validation.svg)](https://greenkeeper.io/)
 
 This is a simple library to do form validation using Typescript's magnificent strong typing features. Framework focuses give an uniform architecture for validating a form fields and a form as a whole with a proper state validation. To do actual field type validations, it is recommended to use this library besides some other library such as [validator -library](https://www.npmjs.com/package/validator).
 
