@@ -322,14 +322,15 @@ initForm<T>(
 `WithForm` is an interface to make it easy to add form property to State interface
 
 ```typescript
-interface State extends WithForm {
+interface State extends WithForm<FormType> {
 }
 ```
+
 Is same as:
 
 ```typescript
 interface State {
-  form: Form<RegisterForm>; // We use the form interface defined before
+  form: Form<FormType>;
 }
 ```
 
