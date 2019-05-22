@@ -27,6 +27,32 @@ describe('Form preprocessing', () => {
     });
   });
 
+  it('will do nothing when trim is set and the value is undefined', () => {
+    const input = {
+      values: {
+        a: undefined,
+      },
+      filled: {
+        a: true,
+      },
+      rules: {
+        fields: {
+          a: {
+            trim: true,
+          },
+        },
+      },
+    };
+    expect(validateForm(input)).toEqual({
+      ...input,
+      values: {
+        a: undefined,
+      },
+      messages: {},
+      isFormValid: true,
+    });
+  });
+
   it('Will call preprocessor method if it defined for the field', () => {
     const input = {
       values: {
