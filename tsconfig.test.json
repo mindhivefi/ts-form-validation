@@ -26,7 +26,6 @@
     "coverage",
     "jest.config.js",
     "lib",
-    "node_modules",
-    "**/*.spec.ts"
+    "node_modules"
   ]
 }
