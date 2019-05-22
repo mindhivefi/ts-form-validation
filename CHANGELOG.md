@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/mindhivefi/ts-form-validation/compare/v1.2.0...v1.2.1) (2019-05-22)
+
+
+### Bug Fixes
+
+* Correction to WithForm documentation on readme ([126973a](https://github.com/mindhivefi/ts-form-validation/commit/126973a))
+
 # [1.2.0](https://github.com/mindhivefi/ts-form-validation/compare/v1.1.6...v1.2.0) (2019-05-22)
 
 
