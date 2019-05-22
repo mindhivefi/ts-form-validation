@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/mindhivefi/ts-form-validation/compare/v1.1.6...v1.2.0) (2019-05-22)
+
+
+### Features
+
+* WithForm helper interface to streamline setting the form to state ([dc91361](https://github.com/mindhivefi/ts-form-validation/commit/dc91361))
+
 ## [1.1.6](https://github.com/mindhivefi/ts-form-validation/compare/v1.1.5...v1.1.6) (2019-03-26)
 
 
