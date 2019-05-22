@@ -82,11 +82,17 @@ const rules: FormValidationRules<RegisterForm> {
     },
     password1: {
       required: true,
-      validate: (value: any) => validator.isLength(value, {min: 7, max: 20})
+      validate: (value: string) => validator.isLength(value, {min: 7, max: 20}) || {
+          type: MessageType.ERROR,
+          message: 'Password must be at least 7-20 characters in length',
+        },
     },
     password2: {
       required: true,
-      validate: (value: any) => validator.isLength(value, {min: 7, max: 20})
+      validate: (value: any) => validator.isLength(value, {min: 7, max: 20}) || {
+          type: MessageType.ERROR,
+          message: 'Password must be at least 7-20 characters in length',
+        },
     },
   }
 };
