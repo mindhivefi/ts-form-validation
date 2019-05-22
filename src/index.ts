@@ -45,7 +45,7 @@ export interface FieldValidator<T, D = any> {
 /**
  * Initialize form with default set
  */
-export const initForm = <T, K extends keyof T>(values: T, rules: FormValidationRules<T>): Form<T> => ({
+export const initForm = <T>(values: T, rules: FormValidationRules<T>): Form<T> => ({
   values,
   filled: {},
   messages: {},
