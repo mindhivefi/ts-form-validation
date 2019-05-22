@@ -2,7 +2,9 @@
 
 [![CircleCI](https://circleci.com/gh/mindhivefi/ts-form-validation/tree/master.svg?style=svg)](https://circleci.com/gh/mindhivefi/ts-form-validation/tree/master)
 
-This is a simple library to do form validation using Typescript's magnificent strong typing features. Framework focuses give an uniform architecture for validating a form fields and a form as a whole with a proper state validation. To do actual field type validations, it is recommended to use this library besides some other library such as [validator -library](https://www.npmjs.com/package/validator).
+This is a simple library to do form validation using Typescript's magnificent strong typing features. Framework focuses in giving an uniform architecture for validating a form fields and a form as a whole with a proper state validation. To do actual field type validations, it is recommended to use this library besides some other library such as [validator -library](https://www.npmjs.com/package/validator).
+
+The framework is been kept in simple, so that it should be easy to integrate into a different frameworks. The framework is been tested in production use with React and React Native projects.
 
 ## Installation
 
@@ -17,6 +19,22 @@ or
 ```bash
 npm install ts-form-validation
 ```
+
+## Migrating from 1.x version
+
+In 2.0 field validator's validate method have a more inituitive notation:
+
+```typescript
+    value =>
+        // return true if field is valid or if not return an error message object:
+        validator.isLength(value, { min: 5, max: 30 }) || {
+          type: MessageType.ERROR,
+          message: 'Display name must be between 5 to 30 characters in length.',
+        },
+```
+
+The old notation which was returning false when there was no need for a message, continues to work but
+it is encouraged to update the form validation to a new notation.
 
 ## Using validator
 
@@ -38,7 +56,7 @@ interface RegisterForm {
 
 ### 2. Define rules for your fields
 
-Rules are defined with an object that is based on your interface created before:
+You define all the form login on rules object. Rules object is defined based on your interface created before:
 
 ```typescript
 const rules: FormValidationRules<RegisterForm> {
@@ -47,7 +65,7 @@ const rules: FormValidationRules<RegisterForm> {
       required: true,
       trim: true,
       validate: (value: string) =>
-        !validator.isLength(value, { min: 5, max: 30 }) && {
+        validator.isLength(value, { min: 5, max: 30 }) || {
           type: MessageType.ERROR,
           message: 'Display name must be between 5 to 30 characters in length.',
         },
@@ -55,9 +73,9 @@ const rules: FormValidationRules<RegisterForm> {
     email: {
       required: true,
       trim: true,
-      // We are using validator -library here to to actual email -check
+      // We are using validator -library here to do the actual email -check
       validate: (value: string) =>
-        !validator.isEmail(value) && {
+        validator.isEmail(value) || {
           type: MessageType.ERROR,
           message: 'Please give a valid email address',
         },
@@ -142,7 +160,7 @@ It is possible to do basic trimming for input or add your own pre processor even
     required: true,
     trim: true,
     validate: (value: string) =>
-        !validator.isEmail(value) && {
+        validator.isEmail(value) || {
           type: MessageType.ERROR,
           message: 'Please give a valid email address',
         },
@@ -169,8 +187,8 @@ So that we will not make the user irritated, we must be able the define when a f
 With react, its natural to make an own component for the form. Let's make a component to support the register form that we created above:
 
 ```typescript
-interface State {
-  form: Form<RegisterForm>; // We use the form interface defined before
+interface State extends WithForm { // <- this will include form -property to state
+  
 }
 
 export default class RegisterScreen extends React.Component<any, State> {
@@ -231,7 +249,7 @@ export default class RegisterScreen extends React.Component<any, State> {
 
     const {
       values,
-      messages: { [key]: message },
+      messages,
     } = this.state.form;
     return (
       <>
@@ -258,24 +276,17 @@ export default class RegisterScreen extends React.Component<any, State> {
   private handleChange = (key: keyof RegisterForm) => (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const values = {
-      ...this.state.form.values,
-      [key]: event.target.value,
-    };
-
-    const form = validateForm(
-      {
-        ...this.state.form,
-        values,
-      },
-      {
-        // Disable preprocess while validating when writing
-        usePreprocessor: false,
-      },
-    );
 
     this.setState({
-      form,
+      form: validateForm(
+        this.state.form, {
+        // Disable preprocess while validating when writing
+        usePreprocessor: false,
+        // Update the field value
+        setValues: {
+          [key] event.target.value
+        }
+      }),
     });
   };
 
@@ -283,23 +294,59 @@ export default class RegisterScreen extends React.Component<any, State> {
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     // set field filled after blur, means that the field as been set once
-    let form = { ...this.state.form };
-    const filled = {
-      ...form.filled,
-      [key]: true,
-    };
-
-    form = validateForm({
-      ...this.state.form,
-      filled,
-    });
-
     this.setState({
-      form,
+      form: validateForm(this.state.form, {
+        setFilled: key, // mark the field be filled
+      }),
     });
   };
 }
 ```
+
+## Api
+
+### InputForm
+
+InputForm is the object to wrap up all the form functionality.
+
+| Property | Description |
+|----------|-------------|
+| values: &lt;T&gt;   | The current field values on the form presented as an object where each key is the name of field and value is the field value. |
+| rules: FormValidationRules&lt;T&gt;   | Rules object containing the validation and constraints of the form |
+| filled?: FilledFormFields&lt;T&gt;   | Marked for each field that have a value to show possible errors on field. Fields will be validated even when the field is not set but no error message will be used. In most of the cases you do not implicitly update filled values. This cab be let be done by `validateForm` -function. |
+
+### FieldValidator
+
+Field validator is an validator interface for a single fields validation.
+
+| Property | Description |
+|----------|-------------|
+| required: boolean   | When set to true, the field value must not be undefined. If the field is not defined. The required text will shown. |
+| requiredText: string \| MessageFunction | Own text to shown when required field have no value after validation. This requires that the filled of the field is also set to true. |
+| trim?: boolean | Trims field's value from white spaces before and after the value. If this is set to true, this will be done before `preprosess` -method |
+| preprocess? (value: T) => T | Do custom preprocessing for the field before the validation. If trim is true, the value given as argument will be trimmed on this phase. Just return the preprocessed value as return value and it will be used by validate -method and formValidation. |
+| validate? (value: T) => T | Do validation for the field. When field is valid after validation the return value must be `true`. When the value is erronous, the result value must be `ValidationMessage` -object. |
+
+### ValidationMessage
+
+ValidationMessage describes an message to be shown to the user when there are some issues that the user should be aware of.
+
+| Property | Description |
+|----------|-------------|
+| type: MessageType | Type of the validation message  | 
+| |  - |
+| message: string | Human readable message to desribe the user what is the issue with the field or the whole form. | 
+
+### MessageType
+
+ValidationMessage describes an message to be shown to the user when there are some issues that the user should be aware of.
+
+| Key | Description |
+|----------|-------------|
+| ERROR | Field or form contains an error. If any validator, will return a message with this code, the form will be treated as invalid (isFormValid will be false). |
+| WARNING | Field or form contains a state for what user should be warned. Form can still to be valid event if it contains warnings. |
+| HINT | Field or form contains a state for what user should be hinted. Form can be treaded valid when containing this kind of messages. |
+| VALIDATION_ERROR | This validation error is to help to find errors at development phase. Error message given, when validator callback fails with the exception. Exception error message will be included into message.  |
 
 ## Helpers
 

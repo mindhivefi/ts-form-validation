@@ -5,13 +5,14 @@
  *
  * @author Ville Venäläinen / Mindhive Oy
  */
+import deepmerge from 'deepmerge';
 
 export const DEFAULT_ERRORMESSAGE_FIELD_IS_REQUIRED = 'This field is required';
 
 /**
  * Validator definitions for a single form field.
  */
-export interface FieldValidator {
+export interface FieldValidator<T, D = any> {
   /**
    * Is field required. Default is false.
    */
@@ -30,19 +31,21 @@ export interface FieldValidator {
   /**
    * Do custom preprocessing for the form value, before the validation.
    */
-  preprocess?: (value: any) => any;
+  preprocess?: (value: T) => T;
   /**
-   * Validate Fields given value.
+   * Validate Fields given value. Return true if the field is valid. If there is an error the result
+   * must be andd ValidationMessage object with a proper error message.
    *
-   * @returns {false | ValidationMessage} Validate if the field should have some level of message. If no validation message is given, the method must return ´false´.
+   * @returns {true | ValidationMessage} Validate if the field should have some level of message.
+   *   If no validation message is given, the method must return ´false´.
    */
-  validate?: (value: any) => false | ValidationMessage;
+  validate?: (value: T, data?: D) => true | ValidationMessage;
 }
 
 /**
  * Initialize form with default set
  */
-export const initForm = <T>(values: T, rules: FormValidationRules<T>): Form<T> => ({
+export const initForm = <T, K extends keyof T>(values: T, rules: FormValidationRules<T>): Form<T> => ({
   values,
   filled: {},
   messages: {},
@@ -69,7 +72,7 @@ export interface InputForm<T> {
    * @type {FilledFormFields<T>}
    * @memberof Form
    */
-  filled: FilledFormFields<T>;
+  filled?: FilledFormFields<T>;
   /**
    * Rules for the validation.
    *
@@ -82,7 +85,7 @@ export interface InputForm<T> {
 type BooleanMap<T> = { [P in keyof T]?: boolean };
 type MapType<T, U> = { [P in keyof T]?: U };
 
-export type FieldValidatorMap<T> = Partial<{ [P in keyof T]: FieldValidator }>;
+export type FieldValidatorMap<T, D> = Partial<{ [P in keyof T]: FieldValidator<T[P], D> }>;
 
 export enum MessageType {
   /**
@@ -91,7 +94,7 @@ export enum MessageType {
    */
   ERROR = 'error',
   /**
-   * Field or form contains a state for what user should be warned. Form can still be
+   * Field or form contains a state for what user should be warned. Form can still to
    * be valid event if it contains warnings.
    */
   WARNING = 'warning',
@@ -199,12 +202,13 @@ export type MessageFunction = () => string;
 /**
  * Rule definitions for form validation
  */
-export interface FormValidationRules<T> {
+export interface FormValidationRules<T, D = any> {
   /**
    * Do validation
    */
   validateForm?: (
     form: RequiredFieldValidationFields<T>,
+    data?: D,
   ) => {
     isFormValid: boolean;
     /**
@@ -220,7 +224,7 @@ export interface FormValidationRules<T> {
   /**
    * Field specific validators
    */
-  fields?: Partial<FieldValidatorMap<T>>;
+  fields?: FieldValidatorMap<T, D>;
 
   /**
    * Default message texts used on validation cases triggered
@@ -238,12 +242,33 @@ export interface FormValidationRules<T> {
  * Options to control how the form validation flow will be executed.
  *
  * @param T Type of custom data object
+ * @param D Type of data object used to deliver custom data to form validation
  */
-export interface ValidateFormOptions<T = any> {
+export interface ValidateFormOptions<T = any, D = any> {
   /**
    * Disable preprocessor. Default value is true
    */
-  usePreprocessor: boolean;
+  usePreprocessor?: boolean;
+
+  /**
+   * Set listed fields to be filled. Value can be a key of single field,
+   * an array of keys or an object with key - boolean pairs. When set
+   * with a key name or an array of key names, filled fields will be set to
+   * true. With an object notation you can alse set filleds to false.
+   */
+  setFilled?: keyof T | Array<keyof T> | FilledFormFields<T>;
+
+  /**
+   * Set form values
+   */
+  setValues?: Partial<T>;
+
+  /**
+   * custom data to be delivered to form validation. If your form validation
+   * requires a domain specific data and you want define the rules object outside of the
+   * ui component, you can use this object to deliver required data to validation method.
+   */
+  data?: D;
 }
 
 /**
@@ -252,6 +277,13 @@ export interface ValidateFormOptions<T = any> {
  */
 export interface WithForm<FormType> {
   form: Form<FormType>;
+}
+
+/**
+ * Make a deep copy of an object. If there is no value an empty object will be created
+ */
+function deepcopy<T>(value: T | undefined): T {
+  return value ? (deepmerge(value, {}) as T) : ({} as T);
 }
 /**
  * Validate form input against a defined rules
@@ -265,27 +297,70 @@ export interface WithForm<FormType> {
  */
 // tslint:disable-next-line: cognitive-complexity
 export function validateForm<T>(form: InputForm<T>, options: ValidateFormOptions = { usePreprocessor: true }): Form<T> {
-  const { values, filled, rules } = form;
+  const formCopy: Form<T> = {
+    filled: deepcopy(form.filled),
+    values: deepcopy<T>(form.values),
+    rules: form.rules,
+    messages: {} as MessageFields<T>,
+    isFormValid: false,
+  };
+
+  const { rules } = formCopy;
+  let { values } = formCopy;
+  // filled can not be undefined here because of deepcopy above but typescript doesn't notice that
+  let filled = formCopy.filled as Partial<BooleanMap<T>>;
+
+  if (options.setFilled) {
+    if (Array.isArray(options.setFilled)) {
+      for (const fieldKey of options.setFilled) {
+        filled[fieldKey] = true;
+      }
+    } else {
+      switch (typeof options.setFilled) {
+        case 'string':
+          filled[options.setFilled] = true;
+          break;
+        case 'object':
+          formCopy.filled = filled = {
+            ...filled,
+            ...(options.setFilled as any),
+          };
+          break;
+        default:
+          throw new Error(
+            'Unexped type for setFilled. Should be an array of strings or a single string pointing to value field.',
+          );
+      }
+    }
+  }
+
+  if (options.setValues) {
+    formCopy.values = values = {
+      ...values,
+      ...options.setValues,
+    } as T;
+  }
+
   // TODO refactor in to sub functions
   const messages = {} as MessageFields<T>;
   let isFormValid = true;
 
   if (rules.fields) {
     for (const fieldKey in rules.fields) {
-      const validator = rules.fields[fieldKey];
-      if (validator) {
-        const field = values[fieldKey];
+      const key = fieldKey as keyof T;
+      const validator = rules.fields[key];
+      if (validator !== undefined) {
+        const field = values[key];
         // Do preprocessing first
-        const value = options.usePreprocessor
-          ? // tslint:disable-next-line: no-useless-cast
-            preprocessFormValue(validator!, field)
-          : field;
-        values[fieldKey] = value;
+        // tslint:disable-next-line: no-useless-cast
+        const value = options.usePreprocessor ? preprocessFormValue(validator!, field) : field;
+
+        values[key] = value;
 
         // Check if required field
         if (validator.required && (value === undefined || (typeof value === 'string' && value.length === 0))) {
-          if (filled[fieldKey]) {
-            messages[fieldKey] = getRequiredFieldErrorMessage<T>(rules, fieldKey);
+          if (filled[key]) {
+            messages[key] = getRequiredFieldErrorMessage(rules, key);
           }
           isFormValid = false;
           continue;
@@ -293,14 +368,28 @@ export function validateForm<T>(form: InputForm<T>, options: ValidateFormOptions
 
         // Custom validation
         if (validator.validate) {
-          const validationResult = validator.validate(value);
-          if (validationResult) {
-            if (filled[fieldKey]) {
-              messages[fieldKey] = validationResult;
-            }
-            if (isFormValid) {
-              isFormValid = validationResult.type !== MessageType.ERROR;
-            }
+          const validationResult = validator.validate(value, options.data);
+
+          switch (typeof validationResult) {
+            case 'boolean':
+              if ((validationResult as any) === false) {
+                console.warn(
+                  `validate method's notation have been changed to true | ValidationMessage since 2.0. Please refactor the validation methods to new notation.`,
+                );
+              }
+              break;
+
+            case 'object':
+              if (filled[fieldKey]) {
+                messages[fieldKey] = validationResult;
+              }
+              if (isFormValid) {
+                isFormValid = validationResult.type !== MessageType.ERROR;
+              }
+              break;
+
+            default:
+              throw new Error(`Unexpected return type from ${fieldKey} -validator: ${typeof validationResult}`);
           }
         }
       }
@@ -309,10 +398,9 @@ export function validateForm<T>(form: InputForm<T>, options: ValidateFormOptions
 
   if (rules.validateForm) {
     // Erase possible old form message
-    const formCopy = { ...form } as Form<T>;
     delete formCopy.formMessage;
 
-    const result = rules.validateForm({ isFormValid, values, filled });
+    const result = rules.validateForm({ isFormValid, values, filled }, options.data);
 
     if (result.formMessage && result.isFormValid) {
       result.isFormValid = result.formMessage.type !== MessageType.ERROR;
@@ -320,13 +408,15 @@ export function validateForm<T>(form: InputForm<T>, options: ValidateFormOptions
     return {
       ...formCopy,
       ...result,
+      filled,
       values,
       messages: { ...messages, ...result.messages },
     };
   }
   return {
-    ...form,
+    ...formCopy,
     values,
+    filled,
     messages,
     isFormValid,
   };
@@ -353,7 +443,7 @@ export const formHaveMessagesOfType = (response: ValidatedForm<any>, type: Messa
 function getRequiredFieldErrorMessage<T>(rules: FormValidationRules<T>, fieldKey: keyof T): MessageField {
   try {
     const fields = rules.fields || ({} as T);
-    const field = fields[fieldKey] as FieldValidator;
+    const field = fields[fieldKey] as FieldValidator<T>;
     if (!field) {
       return {
         type: MessageType.VALIDATION_ERROR,
@@ -391,7 +481,7 @@ function getRequiredFieldErrorMessage<T>(rules: FormValidationRules<T>, fieldKey
  * @param {*} value
  * @returns Preprocessed value
  */
-function preprocessFormValue(validator: FieldValidator, value: any) {
+function preprocessFormValue<T>(validator: FieldValidator<T>, value: any) {
   if (!value) {
     return value;
   }

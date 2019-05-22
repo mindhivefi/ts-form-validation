@@ -229,10 +229,7 @@ describe('Handling form validation', () => {
           fields: {
             a: {
               required: true,
-              validate: (value: any) =>
-                value && value === '123'
-                  ? false
-                  : { type: MessageType.ERROR, message: 'Douh!' },
+              validate: (value: any) => (value && value === '123') || { type: MessageType.ERROR, message: 'Douh!' },
             },
           },
         },
@@ -256,10 +253,7 @@ describe('Handling form validation', () => {
           fields: {
             a: {
               required: true,
-              validate: (value: any) =>
-                value && value === 'wrong'
-                  ? false
-                  : { type: MessageType.ERROR, message: 'Douh!' },
+              validate: (value: any) => (value && value === 'wrong') || { type: MessageType.ERROR, message: 'Douh!' },
             },
           },
         },
@@ -590,6 +584,251 @@ describe('Handling form validation', () => {
         },
       },
       isFormValid: true,
+    });
+  });
+
+  it('will mark field filled when set to options', () => {
+    const input = {
+      values: {
+        a: '123',
+        b: '234',
+      },
+      filled: {
+        a: true,
+      },
+      rules: {
+        fields: {
+          a: {
+            validate: (value: string) => ({
+              type: MessageType.WARNING,
+              message: 'be careful',
+            }),
+          },
+          b: {
+            validate: (value: string) => ({
+              type: MessageType.HINT,
+              message: 'look into mirror',
+            }),
+          },
+        },
+      },
+    };
+    expect(
+      validateForm(input, {
+        setFilled: 'b',
+      }),
+    ).toEqual({
+      ...input,
+      filled: {
+        a: true,
+        b: true,
+      },
+      messages: {
+        a: {
+          message: 'be careful',
+          type: 'warning',
+        },
+        b: {
+          message: 'look into mirror',
+          type: 'hint',
+        },
+      },
+      isFormValid: true,
+    });
+  });
+
+  it('will mark field filled when set to options as an array', () => {
+    const input = {
+      values: {
+        a: '123',
+        b: '234',
+      },
+      rules: {
+        fields: {
+          a: {
+            validate: (value: string) => ({
+              type: MessageType.WARNING,
+              message: 'be careful',
+            }),
+          },
+          b: {
+            validate: (value: string) => ({
+              type: MessageType.HINT,
+              message: 'look into mirror',
+            }),
+          },
+        },
+      },
+    };
+    expect(
+      validateForm(input, {
+        setFilled: ['a', 'b'],
+      }),
+    ).toEqual({
+      ...input,
+      filled: {
+        a: true,
+        b: true,
+      },
+      messages: {
+        a: {
+          message: 'be careful',
+          type: 'warning',
+        },
+        b: {
+          message: 'look into mirror',
+          type: 'hint',
+        },
+      },
+      isFormValid: true,
+    });
+  });
+
+  it('will mark filled fields when an object notation', () => {
+    const input = {
+      values: {
+        a: '123',
+        b: '234',
+      },
+      rules: {
+        fields: {
+          a: {
+            validate: (value: string) => ({
+              type: MessageType.WARNING,
+              message: 'be careful',
+            }),
+          },
+          b: {
+            validate: (value: string) => ({
+              type: MessageType.HINT,
+              message: 'look into mirror',
+            }),
+          },
+        },
+      },
+    };
+    expect(
+      validateForm(input, {
+        setFilled: {
+          a: true,
+          b: false,
+        },
+      }),
+    ).toEqual({
+      ...input,
+      filled: {
+        a: true,
+        b: false,
+      },
+      messages: {
+        a: {
+          message: 'be careful',
+          type: 'warning',
+        },
+      },
+      isFormValid: true,
+    });
+  });
+
+  it('will set values set on options', () => {
+    const input = {
+      values: {
+        a: '123',
+      },
+      filled: {
+        a: true,
+        b: true,
+      },
+      rules: {
+        fields: {
+          a: {
+            validate: (value: string) => ({
+              type: MessageType.WARNING,
+              message: 'be careful',
+            }),
+          },
+          b: {
+            validate: (value: string) => ({
+              type: MessageType.HINT,
+              message: 'look into mirror',
+            }),
+          },
+        },
+      },
+    };
+
+    expect(
+      validateForm(input, {
+        setValues: {
+          b: '456',
+        },
+      }),
+    ).toEqual({
+      ...input,
+      values: {
+        a: '123',
+        b: '456',
+      },
+      messages: {
+        a: {
+          message: 'be careful',
+          type: 'warning',
+        },
+        b: {
+          message: 'look into mirror',
+          type: 'hint',
+        },
+      },
+      isFormValid: true,
+    });
+  });
+
+  describe('Custom data delivery to validators', () => {
+    it('will deliver data to a field validator', () => {
+      let got;
+      const input = {
+        values: {
+          a: '',
+        },
+        filled: {
+          a: true,
+        },
+        rules: {
+          fields: {
+            a: {
+              validate: ((value: any, data: any) => {
+                got = data.test;
+                return true;
+              }) as any,
+            },
+          },
+        },
+      };
+      validateForm(input, { data: { test: 'yay!' } });
+
+      expect(got).toEqual('yay!');
+    });
+
+    it('will deliver data to the form field validator', () => {
+      let got;
+      const input = {
+        values: {
+          a: '',
+        },
+        filled: {
+          a: true,
+        },
+        rules: {
+          fields: {},
+          validateForm: ((form: any, data: any) => {
+            got = data.test;
+            return true;
+          }) as any,
+        },
+      };
+      validateForm(input, { data: { test: 'yay!' } });
+
+      expect(got).toEqual('yay!');
     });
   });
 });
