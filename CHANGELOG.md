@@ -1,3 +1,22 @@
+# [2.0.0](https://github.com/mindhivefi/ts-form-validation/compare/v1.2.1...v2.0.0) (2019-05-22)
+
+
+### Bug Fixes
+
+* Fixed an issue with an example on documentation ([fba0aa5](https://github.com/mindhivefi/ts-form-validation/commit/fba0aa5))
+* Fixed erronous generic param type on form interface ([51efc6f](https://github.com/mindhivefi/ts-form-validation/commit/51efc6f))
+
+
+### Features
+
+* Streamlined api for validation ([f0ec0a4](https://github.com/mindhivefi/ts-form-validation/commit/f0ec0a4))
+
+
+### BREAKING CHANGES
+
+* validate -functions notation changed. The old notation still works but will cause
+warning on validate.
+
 ## [1.2.1](https://github.com/mindhivefi/ts-form-validation/compare/v1.2.0...v1.2.1) (2019-05-22)
 
 
