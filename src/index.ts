@@ -236,14 +236,23 @@ export interface FormValidationRules<T> {
 
 /**
  * Options to control how the form validation flow will be executed.
+ *
+ * @param T Type of custom data object
  */
-export interface ValidateFormOptions {
+export interface ValidateFormOptions<T = any> {
   /**
    * Disable preprocessor. Default value is true
    */
   usePreprocessor: boolean;
 }
 
+/**
+ * Helpper interface to include form on state object. Just extend the
+ * State type with the interface.
+ */
+export interface WithForm<FormType> {
+  form: Form<FormType>;
+}
 /**
  * Validate form input against a defined rules
  *

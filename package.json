@@ -10,7 +10,7 @@
     "build": "./node_modules/.bin/tsc",
     "test": "jest",
     "test:watch": "jest --verbose --watch",
-    "lint": "tslint --fix ./src/**/*.ts*",
+    "lint": "tslint --fix --project . ./src/**/*.ts* ",
     "semantic-release": "semantic-release",
     "predeploy": "yarn build",
     "deploy": "npm deploy",

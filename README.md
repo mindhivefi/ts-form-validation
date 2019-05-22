@@ -301,7 +301,7 @@ export default class RegisterScreen extends React.Component<any, State> {
 }
 ```
 
-## Helper functions
+## Helpers
 
 ### initForm
 
@@ -315,6 +315,22 @@ initForm<T>(
       rules,
     ),
 
+```
+
+### WithForm
+
+`WithForm` is an interface to make it easy to add form property to State interface
+
+```typescript
+interface State extends WithForm {
+}
+```
+Is same as:
+
+```typescript
+interface State {
+  form: Form<RegisterForm>; // We use the form interface defined before
+}
 ```
 
 ### Custom messages for validation
