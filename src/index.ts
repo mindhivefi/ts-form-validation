@@ -31,7 +31,7 @@ export interface FieldValidator<T, D = any> {
   /**
    * Do custom preprocessing for the form value, before the validation.
    */
-  preprocess?: (value: T) => T;
+  preprocess?: (value?: T) => T;
   /**
    * Validate Fields given value. Return true if the field is valid. If there is an error the result
    * must be andd ValidationMessage object with a proper error message.
@@ -39,7 +39,7 @@ export interface FieldValidator<T, D = any> {
    * @returns {true | ValidationMessage} Validate if the field should have some level of message.
    *   If no validation message is given, the method must return ´false´.
    */
-  validate?: (value: T, data?: D) => true | ValidationMessage;
+  validate?: (value?: T, data?: D) => true | ValidationMessage;
 }
 
 /**
