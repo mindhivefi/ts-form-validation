@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/mindhivefi/ts-form-validation/compare/v2.0.0...v2.0.1) (2019-05-23)
+
+
+### Bug Fixes
+
+* Changed validate and preprocess value argument to optional ([4c666e0](https://github.com/mindhivefi/ts-form-validation/commit/4c666e0))
+
 # [2.0.0](https://github.com/mindhivefi/ts-form-validation/compare/v1.2.1...v2.0.0) (2019-05-22)
 
 
