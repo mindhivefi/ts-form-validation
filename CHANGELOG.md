@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/mindhivefi/ts-form-validation/compare/v2.0.1...v2.0.2) (2019-05-26)
+
+
+### Bug Fixes
+
+* Fixed interface use on test case + more test cases ([8138c87](https://github.com/mindhivefi/ts-form-validation/commit/8138c87))
+
 ## [2.0.1](https://github.com/mindhivefi/ts-form-validation/compare/v2.0.0...v2.0.1) (2019-05-23)
 
 
