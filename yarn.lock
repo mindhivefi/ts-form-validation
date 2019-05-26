@@ -641,10 +641,6 @@
 "@types/retry@^0.12.0":
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/@types/retry/-/retry-0.12.0.tgz#2b35eccfcee7d38cd72ad99232fbd58bffb3c84d"
-
-"@types/retry@^0.12.0":
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/@types/retry/-/retry-0.12.0.tgz#2b35eccfcee7d38cd72ad99232fbd58bffb3c84d"
   integrity sha512-wWKOClTTiizcZhXnPY4wikVAwmdYHp8q6DmC+EJUzAMsycb7HB32Kh9RN4+0gExjmPmZSAQjgURXIGATPegAvA==
 
 "@types/stack-utils@^1.0.1":
@@ -6385,10 +6381,10 @@ sax@^1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
 
-semantic-release-cli@5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/semantic-release-cli/-/semantic-release-cli-5.1.0.tgz#9ca4476554e1196c4cc5c875f1397d116fa33872"
-  integrity sha512-iZmmxk2Gk8jwUD1bj+VyGn3EHeahDjwc2V5Rs2CUlpkCUOOp/YhkNR5NuA9JX7TGW5A5wUAXTInagwVIS9HBEQ==
+semantic-release-cli@5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/semantic-release-cli/-/semantic-release-cli-5.1.1.tgz#b8488f5064dd5159a03586751849b71c72b1749f"
+  integrity sha512-dIkY135La+CmD2kEF7DN3GZ/o/TI/T23v+gkV6VaSbLyhKHC9k3Nt+bPZIZmiodk4FX5e53ZT2KxLc5bI+1JDg==
   dependencies:
     babel-polyfill "^6.26.0"
     babel-preset-env "^1.6.1"
@@ -6415,7 +6411,7 @@ semantic-release-cli@5.1.0:
     travis-ci "^2.1.1"
     update-notifier "^3.0.0"
     user-home "^2.0.0"
-    validator "^10.0.0"
+    validator "^11.0.0"
 
 semantic-release@15.13.12:
   version "15.13.12"
@@ -7331,9 +7327,10 @@ validate-npm-package-name@^3.0.0, validate-npm-package-name@~3.0.0:
   dependencies:
     builtins "^1.0.3"
 
-validator@^10.0.0:
-  version "10.11.0"
-  resolved "https://registry.yarnpkg.com/validator/-/validator-10.11.0.tgz#003108ea6e9a9874d31ccc9e5006856ccd76b228"
+validator@^11.0.0:
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/validator/-/validator-11.0.0.tgz#fb10128bfb1fd14ce4ed36b79fc94289eae70667"
+  integrity sha512-+wnGLYqaKV2++nUv60uGzUJyJQwYVOin6pn1tgEiFCeCQO60yeu3Og9/yPccbBX574kxIcEJicogkzx6s6eyag==
 
 verror@1.10.0:
   version "1.10.0"

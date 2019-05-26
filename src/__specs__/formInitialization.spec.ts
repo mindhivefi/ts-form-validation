@@ -1,4 +1,5 @@
-import { FormValidationRules, initForm } from '../index';
+import { MessageType, validateForm } from '..';
+import { FormValidationRules, initForm } from '..';
 
 interface ExampleForm {
   field1: string;
@@ -24,6 +25,72 @@ describe('Form initialization', () => {
       messages: {},
       rules,
       isFormValid: false,
+    });
+  });
+
+  it('Will clear old messages from form on new validation', () => {
+    const input = {
+      values: {
+        a: 'a',
+        b: '',
+      },
+      filled: {
+        a: true,
+      },
+      messages: {
+        b: {
+          type: MessageType.ERROR,
+          message: 'This should vanish',
+        },
+      },
+      rules: {
+        fields: {
+          a: {
+            required: true,
+          },
+        },
+        defaultMessages: {
+          requiredField: () => 'Default not good',
+        },
+      },
+    };
+    expect(validateForm(input)).toEqual({
+      ...input,
+      messages: {},
+      isFormValid: true,
+    });
+  });
+
+  it('Will clear old messages from form on new validation', () => {
+    const input = {
+      values: {
+        a: 'a',
+        b: '',
+      },
+      filled: {
+        a: true,
+      },
+      messages: {
+        a: {
+          type: MessageType.ERROR,
+          message: 'This should vanish',
+        },
+      },
+      rules: {
+        fields: {
+          a: {
+            required: true,
+          },
+        },
+        defaultMessages: {
+          requiredField: () => 'Default not good',
+        },
+      },
+    };
+    expect(validateForm(input)).toEqual({
+      ...input,
+      messages: {},
+      isFormValid: true,
     });
   });
 });
