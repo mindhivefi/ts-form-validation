@@ -353,7 +353,7 @@ export function validateForm<T>(form: InputForm<T>, options: ValidateFormOptions
         const field = values[key];
         // Do preprocessing first
         // tslint:disable-next-line: no-useless-cast
-        const value = options.usePreprocessor ? preprocessFormValue(validator!, field) : field;
+        const value = options.usePreprocessor !== false ? preprocessFormValue(validator!, field) : field;
 
         values[key] = value;
 
