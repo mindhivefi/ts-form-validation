@@ -1,3 +1,10 @@
+## [2.0.3](https://github.com/mindhivefi/ts-form-validation/compare/v2.0.2...v2.0.3) (2019-07-21)
+
+
+### Bug Fixes
+
+* set up usePreprocessor as a default value for options ([36b95d9](https://github.com/mindhivefi/ts-form-validation/commit/36b95d9))
+
 ## [2.0.2](https://github.com/mindhivefi/ts-form-validation/compare/v2.0.1...v2.0.2) (2019-05-26)
 
 
