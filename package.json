@@ -99,6 +99,6 @@
     "lib/index.map"
   ],
   "dependencies": {
-    "deepmerge": "3.2.0"
+    "deepmerge": "4.2.0"
   }
 }
