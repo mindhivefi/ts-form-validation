@@ -199,27 +199,40 @@ export interface RequiredFieldValidationFields<T> {
 }
 
 export type MessageFunction = () => string;
+
+export interface FormValidationSummary<T> {
+  /**
+   * Indicates if the form can be seen as valid. This may be true even
+   * if the messages or formMessage field have values. This happens
+   * if the validated will give hints or warnings that are no show stoppers
+   * for submitting the form values.
+   */
+  isFormValid: boolean;
+  /**
+   * Field specific messages. If there are none, the field can be omitted.
+   */
+  messages?: MessageFields<T>;
+  /**
+   * Message for the whole form.
+   */
+  formMessage?: ValidationMessage;
+}
 /**
  * Rule definitions for form validation
  */
 export interface FormValidationRules<T, D = any> {
   /**
-   * Do validation
+   * Do validation based on all form data. With this event handler you may do more
+   * sophisticated logic to validate the state of the form fields as a group.
+   * 
+   * @param form: form object, with all values and fillee information.
+   * @returns true | {
+   *   }
    */
   validateForm?: (
     form: RequiredFieldValidationFields<T>,
     data?: D,
-  ) => {
-    isFormValid: boolean;
-    /**
-     * Field specific messages
-     */
-    messages: MessageFields<T>;
-    /**
-     * Message for the whole form
-     */
-    formMessage?: ValidationMessage;
-  };
+  ) => true | FormValidationSummary<T>;
 
   /**
    * Field specific validators
@@ -402,6 +415,15 @@ export function validateForm<T>(form: InputForm<T>, options: ValidateFormOptions
 
     const result = rules.validateForm({ isFormValid, values, filled }, options.data);
 
+    if (result === true) {
+      return {
+        ...formCopy,
+        isFormValid: true,
+        filled,
+        values,
+        messages: { ...messages, },
+      };
+    }
     if (result.formMessage && result.isFormValid) {
       result.isFormValid = result.formMessage.type !== MessageType.ERROR;
     }
