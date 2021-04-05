@@ -70,7 +70,7 @@
     "@types/deepmerge": "2.2.0",
     "@types/jest": "26.0.22",
     "commitizen": "4.2.3",
-    "condition-circle": "2.0.2",
+    "condition-circle": "https://github.com/bahmutov/condition-circle.git",
     "husky": "6.0.0",
     "jest": "26.x",
     "rimraf": "3.0.2",
