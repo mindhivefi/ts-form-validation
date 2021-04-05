@@ -90,6 +90,58 @@ describe('Handling form validation', () => {
       });
     });
 
+    it('Will treat form as valid if ', () => {
+      const input = {
+        values: {
+          a: 'cat',
+        },
+        filled: {
+          a: true,
+        },
+        rules: {
+          validateForm: () => true as any,
+          fields: {
+            a: {
+              required: true,
+            },
+          },
+        },
+      };
+      expect(validateForm(input)).toEqual({
+        ...input,
+        messages: {},
+        isFormValid: true,
+      });
+    });
+
+    it('Will not require messages to be returned from formValidation', () => {
+      const input = {
+        values: {
+          a: 'cat',
+        },
+        filled: {
+          a: true,
+        },
+        rules: {
+          validateForm: () => {
+            return {
+              isFormValid: false,              
+            }
+          },
+          fields: {
+            a: {
+              required: true,
+            },
+          },
+        },
+      };
+      expect(validateForm(input)).toEqual({
+        ...input,
+        messages: {},
+        isFormValid: false,
+      });
+    });
+
     it('Will show user defined error message defined in the fields rule ', () => {
       const input = {
         values: {

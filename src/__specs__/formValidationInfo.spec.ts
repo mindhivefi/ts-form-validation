@@ -5,8 +5,7 @@ describe('Form State Info', () => {
   describe('Form info helper functions', () => {
     it('Tells if form has errors', () => {
       expect(
-        formHaveMessagesOfType(
-          {
+        formHaveMessagesOfType({
             values: {},
             messages: {
               hint: {
