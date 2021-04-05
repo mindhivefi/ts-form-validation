@@ -1,3 +1,16 @@
+# [2.1.0](https://github.com/mindhivefi/ts-form-validation/compare/v2.0.3...v2.1.0) (2021-04-05)
+
+
+### Bug Fixes
+
+* temproraly removed condition-circle out of use ([dee6586](https://github.com/mindhivefi/ts-form-validation/commit/dee6586e7a187e2c8b2f4a283923bccdc064e08a))
+* version conflicts with the develop branch ([c92d922](https://github.com/mindhivefi/ts-form-validation/commit/c92d922153c23365c019e05f5046d9cfeddac5d7))
+
+
+### Features
+
+* streamlined api for form level validation ([fffc96a](https://github.com/mindhivefi/ts-form-validation/commit/fffc96a2017b58c98a8c0d1dadd1d634d54629c2))
+
 ## [2.0.3](https://github.com/mindhivefi/ts-form-validation/compare/v2.0.2...v2.0.3) (2019-07-21)
 
 
