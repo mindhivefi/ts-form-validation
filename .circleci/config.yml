@@ -51,8 +51,7 @@ jobs:
           command: yarn check-package
       - run:
           name: Publish package
-          command: npx semantic-release --gh-token=$GH_TOKEN --npm-token=$NPM_TOKEN --gh-username=mindhivefi --npm-username=villevenalainen
-
+          command: npm run semantic-release || true
 workflows:
   version: 2
   deploy-master-to-npm:
