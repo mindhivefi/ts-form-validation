@@ -22,7 +22,6 @@
     "url": "https://github.com/mindhivefi/ts-form-validation.git"
   },
   "release": {
-    "verifyConditions": "condition-circle",
     "plugins": [
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
