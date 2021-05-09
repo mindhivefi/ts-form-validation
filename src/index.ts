@@ -418,7 +418,7 @@ export function validateForm<T>(form: InputForm<T>, options: ValidateFormOptions
     if (result === true) {
       return {
         ...formCopy,
-        isFormValid: true,
+        isFormValid,
         filled,
         values,
         messages: { ...messages, },
