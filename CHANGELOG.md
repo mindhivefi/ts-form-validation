@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/mindhivefi/ts-form-validation/compare/v2.1.0...v2.1.1) (2021-05-09)
+
+
+### Bug Fixes
+
+* fix for a validateForm issue which did override  isFormValid state set by field validators ([2904ce8](https://github.com/mindhivefi/ts-form-validation/commit/2904ce81dc25614d2bbf9bba700bc7118d08c1eb))
+
 # [2.1.0](https://github.com/mindhivefi/ts-form-validation/compare/v2.0.3...v2.1.0) (2021-04-05)
 
 
