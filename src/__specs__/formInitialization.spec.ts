@@ -93,4 +93,31 @@ describe('Form initialization', () => {
       isFormValid: true,
     });
   });
+
+  it('Will return a initial filled values when calling initForm', () => {
+    const rules: FormValidationRules<ExampleForm> = {};
+    expect(
+      initForm<ExampleForm>(
+        {
+          field1: 'value',
+        },
+
+        rules,
+
+        {
+          field1: true, 
+        }
+      ),
+    ).toEqual({
+      values: {
+        field1: 'value',
+      },
+      filled: {
+        field1: true,
+      },
+      messages: {},
+      rules,
+      isFormValid: false,
+    });
+  });
 });

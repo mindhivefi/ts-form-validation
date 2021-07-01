@@ -366,9 +366,11 @@ initForm<T>(
         // initial values for fields
       },
       rules,
+      filled // optional setting of the fields filled as default
     ),
 
 ```
+Note that setting fields filled will not run the form validation for the fields.
 
 ### WithForm
 

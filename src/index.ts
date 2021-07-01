@@ -42,12 +42,15 @@ export interface FieldValidator<T, D = any> {
   validate?: (value?: T, data?: D) => true | ValidationMessage;
 }
 
+
+
 /**
  * Initialize form with default set
  */
-export const initForm = <T>(values: T, rules: FormValidationRules<T>): Form<T> => ({
+export const initForm = <T>(values: T, rules: FormValidationRules<T>,
+  filled: FilledFormFields<T> = {}): Form<T> => ({
   values,
-  filled: {},
+  filled,
   messages: {},
   rules,
   isFormValid: false,
