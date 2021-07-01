@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/mindhivefi/ts-form-validation/compare/v2.1.1...v2.2.0) (2021-07-01)
+
+
+### Features
+
+* possibility to set form fields filled in initation ([118aea0](https://github.com/mindhivefi/ts-form-validation/commit/118aea036624255375878bc17f35e62842aaf68f))
+
 ## [2.1.1](https://github.com/mindhivefi/ts-form-validation/compare/v2.1.0...v2.1.1) (2021-05-09)
 
 
